@@ -9,6 +9,8 @@ import lombok.extern.jackson.Jacksonized;
 import javax.validation.constraints.NotNull;
 import java.time.LocalDateTime;
 
+import static ru.practicum.common.Utils.DATE_PARAM_FORMAT_PATTERN;
+
 @Builder
 @Data
 @Jacksonized
@@ -21,6 +23,6 @@ public class EndpointHitInfoDto {
     @NotNull
     private String ip;
     @NotNull
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = DATE_PARAM_FORMAT_PATTERN)
     private LocalDateTime timestamp;
 }
