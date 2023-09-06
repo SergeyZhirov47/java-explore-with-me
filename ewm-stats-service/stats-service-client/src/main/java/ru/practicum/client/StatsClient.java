@@ -24,7 +24,7 @@ import java.util.Optional;
 @Component
 @Slf4j
 public class StatsClient {
-    private final static String STATS_SERVER_BASE_URL = "http://localhost:9090";
+    private static final String STATS_SERVER_BASE_URL = "http://localhost:9090";
     private final RestTemplate restTemplate;
     private final HttpHeaders headers = new HttpHeaders();
     private final ObjectMapper objectMapper;
