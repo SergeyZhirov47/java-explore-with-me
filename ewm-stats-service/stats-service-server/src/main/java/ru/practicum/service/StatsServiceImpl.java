@@ -24,8 +24,13 @@ public class StatsServiceImpl implements StatsService {
 
     @Override
     public List<EndpointStatsDto> getStatistics(LocalDateTime start, LocalDateTime end, List<String> uris, Boolean unique) {
-        // ToDo
-        // Проверка дат.
+        validateStatsDateParams(start, end);
         return daoEndpointHitInfo.getStatistics(start, end, uris, unique);
+    }
+
+    private void validateStatsDateParams(LocalDateTime start, LocalDateTime end) {
+        if (start.isAfter(end)) {
+            throw new IllegalArgumentException(String.format("start - %s не может быть позже end - %s!", start, end));
+        }
     }
 }
