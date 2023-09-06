@@ -1,6 +1,8 @@
 package ru.practicum.repository;
 
 import com.querydsl.core.types.dsl.BooleanExpression;
+import com.querydsl.core.types.dsl.Expressions;
+import com.querydsl.core.types.dsl.NumberPath;
 import com.querydsl.jpa.JPQLTemplates;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
@@ -43,26 +45,28 @@ public class DaoEndpointHitInfoImpl implements DaoEndpointHitInfo {
     public List<EndpointStatsDto> getStatistics(LocalDateTime start, LocalDateTime end, List<String> uris, Boolean uniqueIP) {
         final QEndpointHitInfo hitInfo = QEndpointHitInfo.endpointHitInfo;
 
-        BooleanExpression finalExpression = getStartEndTimeExpression(start, end);
+        BooleanExpression whereExpression = getStartEndTimeExpression(start, end);
 
         if (nonNull(uris) && !uris.isEmpty()) {
-            finalExpression = finalExpression.and(getUrisInExpression(uris));
+            whereExpression = whereExpression.and(getUrisInExpression(uris));
         }
 
         var hits = hitInfo.ip.count();
         if (nonNull(uniqueIP) && uniqueIP) {
             hits = hitInfo.ip.countDistinct();
         }
+        final NumberPath<Long> aliasHits = Expressions.numberPath(Long.class, "hits");
 
         val queryResult = queryFactory.selectFrom(hitInfo)
-                .where(finalExpression)
+                .where(whereExpression)
                 .groupBy(QEndpointHitInfo.endpointHitInfo.app, QEndpointHitInfo.endpointHitInfo.uri)
-                .select(hitInfo.app, hitInfo.uri, hits)
+                .select(hitInfo.app, hitInfo.uri, hits.as(aliasHits))
+                .orderBy(aliasHits.desc())
                 .fetch();
 
         final List<EndpointStatsDto> finalResult = new ArrayList<>();
         for (val row : queryResult) {
-            finalResult.add(new EndpointStatsDto(row.get(hitInfo.app), row.get(hitInfo.uri), row.get(2, Long.class)));
+            finalResult.add(new EndpointStatsDto(row.get(hitInfo.app), row.get(hitInfo.uri), row.get(aliasHits)));
         }
 
         return finalResult;
