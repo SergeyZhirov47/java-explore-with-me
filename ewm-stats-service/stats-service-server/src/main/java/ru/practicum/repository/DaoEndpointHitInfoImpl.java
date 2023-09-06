@@ -1,11 +1,10 @@
 package ru.practicum.repository;
 
-import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.BooleanExpression;
-import com.querydsl.core.types.dsl.StringPath;
 import com.querydsl.jpa.JPQLTemplates;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
+import lombok.val;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import ru.practicum.dto.EndpointStatsDto;
@@ -42,11 +41,7 @@ public class DaoEndpointHitInfoImpl implements DaoEndpointHitInfo {
 
     @Override
     public List<EndpointStatsDto> getStatistics(LocalDateTime start, LocalDateTime end, List<String> uris, Boolean uniqueIP) {
-        QEndpointHitInfo hitInfo = QEndpointHitInfo.endpointHitInfo;
-
-        List<StringPath> groupByList = new ArrayList<>();
-        groupByList.add(QEndpointHitInfo.endpointHitInfo.app);
-        groupByList.add(QEndpointHitInfo.endpointHitInfo.uri);
+        final QEndpointHitInfo hitInfo = QEndpointHitInfo.endpointHitInfo;
 
         BooleanExpression finalExpression = getStartEndTimeExpression(start, end);
 
@@ -54,21 +49,23 @@ public class DaoEndpointHitInfoImpl implements DaoEndpointHitInfo {
             finalExpression = finalExpression.and(getUrisInExpression(uris));
         }
 
+        var hits = hitInfo.ip.count();
         if (nonNull(uniqueIP) && uniqueIP) {
-            // Получить список уникальных посещений (app, uri, ip).
-
-            groupByList.add(QEndpointHitInfo.endpointHitInfo.ip);
+            hits = hitInfo.ip.countDistinct();
         }
 
-        StringPath[] groupByFieldsArr = new StringPath[groupByList.size()];
-        groupByFieldsArr = groupByList.toArray(groupByFieldsArr);
-
-        List<EndpointStatsDto> result = queryFactory.select(finalExpression)
-                .groupBy(groupByFieldsArr)
-                .select(Projections.bean(EndpointStatsDto.class, hitInfo.app, hitInfo.uri, hitInfo.ip.count()))
+        val queryResult = queryFactory.selectFrom(hitInfo)
+                .where(finalExpression)
+                .groupBy(QEndpointHitInfo.endpointHitInfo.app, QEndpointHitInfo.endpointHitInfo.uri)
+                .select(hitInfo.app, hitInfo.uri, hits)
                 .fetch();
 
-        return result;
+        final List<EndpointStatsDto> finalResult = new ArrayList<>();
+        for (val row : queryResult) {
+            finalResult.add(new EndpointStatsDto(row.get(hitInfo.app), row.get(hitInfo.uri), row.get(2, Long.class)));
+        }
+
+        return finalResult;
     }
 
     private BooleanExpression getStartEndTimeExpression(LocalDateTime start, LocalDateTime end) {
