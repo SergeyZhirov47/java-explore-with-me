@@ -9,6 +9,7 @@ import ru.practicum.dto.EndpointHitInfoDto;
 import ru.practicum.dto.EndpointStatsDto;
 import ru.practicum.service.StatsService;
 
+import javax.validation.Valid;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -22,7 +23,7 @@ public class StatsServerController {
 
     @PostMapping("/hit")
     @ResponseStatus(HttpStatus.CREATED)
-    public void hit(@RequestBody EndpointHitInfoDto endpointHitInfoDto) {
+    public void hit(@RequestBody @Valid EndpointHitInfoDto endpointHitInfoDto) {
         log.info(String.format("POST /hit, body = %s", endpointHitInfoDto));
         statsService.saveHitInfo(endpointHitInfoDto);
     }
