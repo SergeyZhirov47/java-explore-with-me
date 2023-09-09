@@ -8,6 +8,7 @@ import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
 import lombok.val;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Repository;
 import ru.practicum.dto.EndpointStatsDto;
 import ru.practicum.model.EndpointHitInfo;
 import ru.practicum.model.QEndpointHitInfo;
@@ -20,6 +21,7 @@ import java.util.List;
 
 import static java.util.Objects.nonNull;
 
+@Repository
 @RequiredArgsConstructor
 public class DaoEndpointHitInfoImpl implements DaoEndpointHitInfo {
     private final EndpointHitInfoRepository endpointHitInfoRepository;
