@@ -13,13 +13,13 @@ import java.util.Map;
 @ControllerAdvice
 @Slf4j
 public class ControllerExceptionHandler {
-    @ExceptionHandler(Throwable.class)
+    @ExceptionHandler
     public ResponseEntity<String> handle(Throwable exp) {
         log.error(exp.getMessage(), exp);
         return new ResponseEntity<>("internal server error. info: " + exp.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
-    @ExceptionHandler(MethodArgumentNotValidException.class)
+    @ExceptionHandler
     public ResponseEntity<Map<String, String>> handle(MethodArgumentNotValidException exp) {
         log.warn(exp.getMessage(), exp);
 
@@ -29,7 +29,7 @@ public class ControllerExceptionHandler {
         return new ResponseEntity<>(errorMessageMap, HttpStatus.BAD_REQUEST);
     }
 
-    @ExceptionHandler(IllegalArgumentException.class)
+    @ExceptionHandler
     public ResponseEntity<String> handle(IllegalArgumentException exp) {
         log.error(exp.getMessage(), exp);
         return new ResponseEntity<>(exp.getMessage(), HttpStatus.BAD_REQUEST);
