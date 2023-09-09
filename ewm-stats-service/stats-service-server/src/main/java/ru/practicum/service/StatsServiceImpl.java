@@ -2,6 +2,7 @@ package ru.practicum.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.dto.EndpointHitInfoDto;
 import ru.practicum.dto.EndpointStatsDto;
 import ru.practicum.model.EndpointHitInfo;
@@ -16,12 +17,14 @@ import java.util.List;
 public class StatsServiceImpl implements StatsService {
     private final DaoEndpointHitInfo daoEndpointHitInfo;
 
+    @Transactional
     @Override
     public void saveHitInfo(EndpointHitInfoDto endpointHitInfoDto) {
         final EndpointHitInfo endpointHitInfo = EndpointHitInfoMapper.toEndpointHitInfo(endpointHitInfoDto);
         daoEndpointHitInfo.save(endpointHitInfo);
     }
 
+    @Transactional(readOnly = true)
     @Override
     public List<EndpointStatsDto> getStatistics(LocalDateTime start, LocalDateTime end, List<String> uris, Boolean unique) {
         validateStatsDateParams(start, end);
