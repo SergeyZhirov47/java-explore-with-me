@@ -12,7 +12,7 @@ import java.util.List;
 @RequiredArgsConstructor
 @RequestMapping(path = "/categories")
 @Slf4j
-public class CategoryController {
+public class CategoryPublicController {
     private final CategoryService categoryService;
 
     @GetMapping
