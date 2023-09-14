@@ -2,12 +2,14 @@ package ru.practicum.category.repository;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
+import org.springframework.stereotype.Repository;
 import ru.practicum.category.model.Category;
 import ru.practicum.common.exception.NotFoundException;
 
 import java.util.List;
 import java.util.Optional;
 
+@Repository
 @RequiredArgsConstructor
 public class CategoryDaoImpl implements CategoryDao {
     private final CategoryRepository categoryRepository;
