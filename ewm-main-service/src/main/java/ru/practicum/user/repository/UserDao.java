@@ -13,4 +13,8 @@ public interface UserDao {
     List<User> findAll(Pageable pageable);
 
     List<User> getByIds(List<Long> ids, Pageable pageable);
+
+    User getUser(long id);
+
+    void checkUserExists(long id);
 }

@@ -3,7 +3,6 @@ package ru.practicum.user.service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-import ru.practicum.common.OffsetBasedPageRequest;
 import ru.practicum.common.OffsetPageableValidator;
 import ru.practicum.user.dto.UserCreateDto;
 import ru.practicum.user.dto.UserDto;
@@ -12,12 +11,9 @@ import ru.practicum.user.model.User;
 import ru.practicum.user.repository.UserDao;
 
 import java.util.List;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import static java.util.Objects.isNull;
-import static java.util.Objects.nonNull;
-import static java.util.stream.Collectors.*;
+import static java.util.stream.Collectors.toUnmodifiableList;
 
 @Service
 @RequiredArgsConstructor
@@ -48,6 +44,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public void delete(long id) {
+        userDao.checkUserExists(id);
         userDao.delete(id);
     }
 }
