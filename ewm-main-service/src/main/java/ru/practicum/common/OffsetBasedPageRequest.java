@@ -4,8 +4,6 @@ import lombok.EqualsAndHashCode;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 
-import static java.util.Objects.nonNull;
-
 @EqualsAndHashCode
 public class OffsetBasedPageRequest implements Pageable {
     private final int limit;
