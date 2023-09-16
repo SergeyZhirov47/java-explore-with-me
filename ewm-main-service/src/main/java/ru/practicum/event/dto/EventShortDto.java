@@ -18,6 +18,7 @@ import static ru.practicum.common.Utils.DATE_PARAM_FORMAT_PATTERN;
 @Data
 @AllArgsConstructor
 public class EventShortDto {
+    private long id;
     private String annotation;
     private String title;
     private String description;
@@ -27,6 +28,6 @@ public class EventShortDto {
     private LocalDateTime eventDate;
     @JsonProperty("paid")
     private boolean isPaid;
-    private int confirmedRequests;
-    private int views;
+    private long confirmedRequests;
+    private long views;
 }

@@ -5,7 +5,6 @@ import com.querydsl.core.types.dsl.PathBuilderFactory;
 import com.querydsl.jpa.JPQLTemplates;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
-import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.support.Querydsl;
@@ -15,7 +14,6 @@ import ru.practicum.event.model.Event;
 import ru.practicum.event.model.EventSort;
 import ru.practicum.event.model.EventState;
 import ru.practicum.event.model.QEvent;
-import ru.practicum.request.model.QRequest;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
@@ -26,7 +24,6 @@ import java.util.Optional;
 import static java.util.Objects.nonNull;
 
 @Repository
-@RequiredArgsConstructor
 public class EventDaoImpl implements EventDao {
     private final EventRepository eventRepository;
     private final JPAQueryFactory queryFactory;
@@ -103,7 +100,6 @@ public class EventDaoImpl implements EventDao {
                                           Boolean paid,
                                           LocalDateTime start,
                                           LocalDateTime end,
-                                          Boolean onlyAvailable,
                                           EventSort sort,
                                           Pageable pageable) {
         final QEvent qEvent = QEvent.event;
@@ -116,21 +112,12 @@ public class EventDaoImpl implements EventDao {
         whereExpression = whereExpression.and(qEvent.eventDate.after(start));
         whereExpression = whereExpression.and(qEvent.eventDate.before(end));
 
-        // ToDo !
-        //QRequest qRequest = QRequest.request;
-        //qRequest.status.
+        JPAQuery<Event> searchQuery = queryFactory.selectFrom(qEvent)
+                .where(whereExpression);
 
-        // Как сделать проверку, что не исчерпан лимит?
-        // whereExpression = whereExpression.and(qEvent.participantLimit);
-
-        // Получить те события, у которых participantLimit < подтвержденных заявок
-
-
-        // ToDo
-        // Как сортировать по кол-ву просмотров?
-        // EventSort.VIEWS
-
-        final JPAQuery<Event> searchQuery = queryFactory.selectFrom(qEvent).where(whereExpression);
+        if (nonNull(sort) && sort.equals(EventSort.EVENT_DATE)) {
+            searchQuery = searchQuery.orderBy(qEvent.eventDate.asc());
+        }
 
         final List<Event> result;
         if (nonNull(pageable) && pageable.isPaged()) {
@@ -140,6 +127,6 @@ public class EventDaoImpl implements EventDao {
             result = searchQuery.fetch();
         }
 
-        return null;
+        return result;
     }
 }

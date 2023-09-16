@@ -1,9 +1,6 @@
 package ru.practicum.event.service;
 
-import ru.practicum.event.dto.EventCreateDto;
-import ru.practicum.event.dto.EventFullDto;
-import ru.practicum.event.dto.EventUpdateByAdminDto;
-import ru.practicum.event.dto.EventUpdateByUserDto;
+import ru.practicum.event.dto.*;
 import ru.practicum.event.model.EventSort;
 import ru.practicum.event.model.EventState;
 
@@ -29,15 +26,15 @@ public interface EventService {
                               Integer from,
                               Integer size);
 
-    List<EventFullDto> getPublishedEvents(String text,
-                                          List<Long> categoryIds,
-                                          Boolean paid,
-                                          LocalDateTime start,
-                                          LocalDateTime end,
-                                          Boolean onlyAvailable,
-                                          EventSort sort,
-                                          Integer from,
-                                          Integer size);
+    List<EventShortDto> getPublishedEvents(String text,
+                                           List<Long> categoryIds,
+                                           Boolean paid,
+                                           LocalDateTime start,
+                                           LocalDateTime end,
+                                           Boolean onlyAvailable,
+                                           EventSort sort,
+                                           Integer from,
+                                           Integer size);
 
     List<EventFullDto> getEventsByUser(long userId, Integer from, Integer size);
 }

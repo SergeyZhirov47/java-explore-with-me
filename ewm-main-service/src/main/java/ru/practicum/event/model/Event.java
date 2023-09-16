@@ -43,4 +43,8 @@ public class Event {
             @AttributeOverride(name = "longitude", column = @Column(name = "lon"))
     })
     private Location location;
+    @Transient
+    private long confirmedRequests;
+    @Transient
+    private long views;
 }

@@ -12,7 +12,12 @@ import ru.practicum.event.service.EventService;
 
 import javax.servlet.http.HttpServletRequest;
 import java.time.LocalDateTime;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+
+import static java.util.Objects.nonNull;
 
 @RestController
 @RequiredArgsConstructor
@@ -31,20 +36,41 @@ public class EventPublicController {
                                                   @RequestParam(defaultValue = "false") Boolean onlyAvailable,
                                                   @RequestParam(required = false) EventSort sort,
                                                   @RequestParam(defaultValue = "0") Integer from,
-                                                  @RequestParam(defaultValue = "10") Integer size) {
-        // Map<String, Object> map;
+                                                  @RequestParam(defaultValue = "10") Integer size,
+                                                  HttpServletRequest request) throws JsonProcessingException {
+        Map<String, Object> params = new HashMap<>();
+        params.put("text", text);
+        params.put("categories", categories);
+        params.put("paid", paid);
+        params.put("rangeStart", rangeStart);
+        params.put("rangeEnd", rangeEnd);
+        params.put("onlyAvailable", onlyAvailable);
+        params.put("sort", sort);
+        params.put("from", from);
+        params.put("size", size);
 
-        // ToDo
-        // Придумать как по нормальному сформировать строку логов.
-        // если нет параметра, то не добавлять
-        final String logStr = String.format("GET /events?text={text}&categories={categories}&paid={paid}&rangeStart={rangeStart}, " +
-                "{text} = %s, {categories} = %s", text, categories);
-        log.info(logStr);
+        params = params.entrySet().stream()
+                .filter(p -> nonNull(p.getValue()))
+                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
 
-        return null;
+        StringBuilder uriStringBuilder = new StringBuilder("GET /events?");
+        StringBuilder paramsStringBuilder = new StringBuilder();
+        for (Map.Entry<String, Object> kv : params.entrySet()) {
+            String paramNameStr = kv.getKey() + "={" + kv.getKey() + "}";
+            String paramValueStr = kv.getKey() + " = " + kv.getValue().toString();
+
+            uriStringBuilder.append(paramNameStr);
+            paramsStringBuilder.append(paramValueStr);
+        }
+
+        log.info(uriStringBuilder + ", " + paramsStringBuilder);
+
+        final List<EventShortDto> publishedEvents = eventService.getPublishedEvents(text, categories, paid, rangeStart, rangeEnd, onlyAvailable, sort, from, size);
+        clientWrapper.saveHit(request);
+
+        return publishedEvents;
     }
 
-    //информация о событии должна включать в себя количество просмотров и количество подтвержденных запросов
     @GetMapping("/{id}")
     public EventFullDto getEventFullInfo(@PathVariable long id, HttpServletRequest request) throws JsonProcessingException {
         log.info(String.format("GET /events/{id}, {id} = %s", id));

@@ -1,7 +1,6 @@
 package ru.practicum.request.repository;
 
 import org.springframework.data.domain.Sort;
-import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.request.model.Request;
 
 import java.util.List;
@@ -29,5 +28,5 @@ public interface RequestDao {
     int getConfirmedRequestsCount(long eventId);
 
     // Ключ - id события, значение - кол-во подтвержденных заявок на это событие.
-    Map<Long, Long> getConfirmedRequestsCount(List<Long> eventIds);
+    Map<Long, Long> getConfirmedRequestsCountMap(List<Long> eventIds);
 }

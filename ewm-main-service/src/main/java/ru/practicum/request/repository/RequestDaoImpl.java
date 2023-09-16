@@ -91,23 +91,34 @@ public class RequestDaoImpl implements RequestDao {
     }
 
     @Override
-    public Map<Long, Long> getConfirmedRequestsCount(List<Long> eventIds) {
+    public Map<Long, Long> getConfirmedRequestsCountMap(List<Long> eventIds) {
         final QRequest qRequest = QRequest.request;
 
         BooleanExpression whereExpression = qRequest.event().id.in(eventIds);
         whereExpression = whereExpression.and(qRequest.status.eq(RequestStatus.CONFIRMED));
 
-        final SimpleExpression<Long> requestId = qRequest.id.count();
+        final SimpleExpression<Long> confirmedRequestCount = qRequest.id.count();
         final NumberPath<Long> aliasConfirmedCount = Expressions.numberPath(Long.class, "confirmedCount");
 
-        final List<Tuple> queryResult = queryFactory.selectFrom(qRequest)
+//        final List<Tuple> queryResult = queryFactory.selectFrom(qRequest)
+//                .where(whereExpression)
+//                .groupBy(qRequest.event().id)
+//                .select(qRequest.event().id, confirmedRequestCount.as(aliasConfirmedCount))
+//                .fetch();
+//
+//        final Map<Long, Long> resultMap = new HashMap<>();
+//        for (Tuple row : queryResult) {
+//            resultMap.put(row.get(qRequest.event().id), row.get(aliasConfirmedCount));
+//        }
+
+        var result = queryFactory.select(qRequest.event().id, confirmedRequestCount.as(aliasConfirmedCount))
+                .from(qRequest)
                 .where(whereExpression)
                 .groupBy(qRequest.event().id)
-                .select(qRequest.event().id, requestId.as(aliasConfirmedCount))
                 .fetch();
 
         final Map<Long, Long> resultMap = new HashMap<>();
-        for (Tuple row : queryResult) {
+        for (Tuple row : result) {
             resultMap.put(row.get(qRequest.event().id), row.get(aliasConfirmedCount));
         }
 

@@ -193,6 +193,6 @@ public class RequestServiceImpl implements RequestService {
     }
 
     private List<RequestDto> mapRequestsToDto(List<Request> requests) {
-       return requests.stream().map(RequestMapper::toRequestDto).collect(toUnmodifiableList());
+        return requests.stream().map(RequestMapper::toRequestDto).collect(toUnmodifiableList());
     }
 }

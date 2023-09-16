@@ -45,6 +45,22 @@ public class EventMapper extends AbstractMapper {
                 .build();
     }
 
+    public EventShortDto ToEventShortDto(Event event) {
+        final UserDto initiator = UserMapper.toUserDto(event.getInitiator());
+        final CategoryDto category = CategoryMapper.toCategoryDto(event.getCategory());
+
+        return EventShortDto.builder()
+                .id(event.getId())
+                .title(event.getTitle())
+                .description(event.getDescription())
+                .annotation(event.getAnnotation())
+                .isPaid(event.isPaid())
+                .eventDate(event.getEventDate())
+                .initiator(initiator)
+                .category(category)
+                .build();
+    }
+
 //    public Event updateIfDifferent(final Event event, final EventCreateDto eventWithChanges) {
 //        return Event.builder()
 //                .id(event.getId())

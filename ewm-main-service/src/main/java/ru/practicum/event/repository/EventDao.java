@@ -31,7 +31,6 @@ public interface EventDao {
                                    Boolean paid,
                                    LocalDateTime start,
                                    LocalDateTime end,
-                                   Boolean onlyAvailable,
                                    EventSort sort,
                                    Pageable pageable);
 }

@@ -18,11 +18,13 @@ import ru.practicum.user.repository.UserDao;
 
 import java.time.LocalDateTime;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
-import static java.util.stream.Collectors.toUnmodifiableList;
+import static java.util.Objects.isNull;
+import static java.util.Objects.nonNull;
+import static java.util.stream.Collectors.*;
 
 @Service
 @RequiredArgsConstructor
@@ -149,36 +151,45 @@ public class EventServiceImpl implements EventService {
 
         // ToDo ???
         // Получение и установка данных из статистики и заявок
-//        final List<Long> eventIds = searchedEvents.stream().map(Event::getId).collect(toUnmodifiableList());
-//        final Map<Long, Long> eventsConfirmedRequestsMap = requestDao.getConfirmedRequestsCount(eventIds);
-//        final Map<Long, Long> eventsViewsMap = getEventsViewsMap(eventIds);
-//
-//        final List<EventFullDto> result = new ArrayList<>();
-//        for (Event event : searchedEvents) {
-//            final EventFullDto eventFullDto = EventMapper.ToEventFullDto(event);
-//            eventFullDto.setConfirmedRequests(eventsConfirmedRequestsMap.getOrDefault(event.getId(), 0L));
-//            eventFullDto.setViews(eventsViewsMap.getOrDefault(event.getId(), 0L));
-//
-//            result.add(eventFullDto);
-//        }
 
         final List<EventFullDto> result = searchedEvents.stream().map(EventMapper::ToEventFullDto).collect(toUnmodifiableList());
         return result;
     }
 
     @Override
-    public List<EventFullDto> getPublishedEvents(String text,
-                                                 List<Long> categoryIds,
-                                                 Boolean paid,
-                                                 LocalDateTime start,
-                                                 LocalDateTime end,
-                                                 Boolean onlyAvailable,
-                                                 EventSort sort,
-                                                 Integer from,
-                                                 Integer size) {
+    public List<EventShortDto> getPublishedEvents(String text,
+                                                  List<Long> categoryIds,
+                                                  Boolean paid,
+                                                  LocalDateTime start,
+                                                  LocalDateTime end,
+                                                  Boolean onlyAvailable,
+                                                  EventSort sort,
+                                                  Integer from,
+                                                  Integer size) {
         final Pageable pageable = OffsetPageableValidator.validateAndGet(from, size);
+        // если в запросе не указан диапазон дат [rangeStart-rangeEnd], то нужно выгружать события, которые произойдут позже текущей даты и времени
+        if (isNull(start) && isNull(end)) {
+            start = LocalDateTime.now();
+        }
 
-        return null;
+        List<Event> filteredEvents = eventDao.getPublishedEvents(text, categoryIds, paid, start, end, sort, pageable);
+
+        // Получение и установка данных из статистики и заявок.
+        addViewsAndConfirmedRequests(filteredEvents);
+
+        // Сами отсеиваем те события на которых достигнут лимит по участникам.
+        if (nonNull(onlyAvailable) && onlyAvailable) {
+            filteredEvents = filteredEvents.stream()
+                    .filter(e -> e.getParticipantLimit() == 0 || e.getConfirmedRequests() < e.getParticipantLimit())
+                    .collect(toList());
+        }
+
+        // Сами сортируем по просмотрам.
+        if (nonNull(sort) && sort.equals(EventSort.VIEWS)) {
+            filteredEvents.sort(Comparator.comparingLong(Event::getViews));
+        }
+
+        return filteredEvents.stream().map(EventMapper::ToEventShortDto).collect(toUnmodifiableList());
     }
 
     @Override
@@ -207,9 +218,24 @@ public class EventServiceImpl implements EventService {
         }
     }
 
-    public void validateEventStateForUpdate(EventState state) {
+    private void validateEventStateForUpdate(EventState state) {
         if (!(state.equals(EventState.PENDING) || state.equals(EventState.CANCELED))) {
             throw new IllegalStateException("Изменять можно только отмененные события или события в состоянии ожидания модерации!");
+        }
+    }
+
+    private void addViewsAndConfirmedRequests(List<Event> events) {
+        if (events.isEmpty()) {
+            return;
+        }
+
+        final List<Long> eventIds = events.stream().map(Event::getId).collect(toUnmodifiableList());
+        final Map<Long, Long> eventsConfirmedRequestsMap = requestDao.getConfirmedRequestsCountMap(eventIds);
+        final Map<Long, Long> eventsViewsMap = getEventsViewsMap(eventIds);
+
+        for (Event event : events) {
+            event.setConfirmedRequests(eventsConfirmedRequestsMap.getOrDefault(event.getId(), 0L));
+            event.setViews(eventsViewsMap.getOrDefault(event.getId(), 0L));
         }
     }
 
@@ -257,10 +283,10 @@ public class EventServiceImpl implements EventService {
     }
 
     private Map<Long, Long> getEventsViewsMap(List<Long> ids) {
-        final Map<String, Long> uriIdMap = ids.stream().collect(Collectors.toMap(this::getEventUri, id -> id));
+        final Map<String, Long> uriIdMap = ids.stream().collect(toMap(this::getEventUri, id -> id));
         final List<EndpointStatsDto> viewStats = getEventViewsStat(ids);
 
-        return viewStats.stream().collect(Collectors.toMap(uriIdMap::get, EndpointStatsDto::getHits));
+        return viewStats.stream().collect(toMap(uriIdMap::get, EndpointStatsDto::getHits));
     }
 
     private String getEventUri(long id) {
