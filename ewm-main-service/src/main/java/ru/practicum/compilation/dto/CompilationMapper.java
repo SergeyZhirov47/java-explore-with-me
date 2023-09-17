@@ -3,10 +3,8 @@ package ru.practicum.compilation.dto;
 import lombok.experimental.UtilityClass;
 import ru.practicum.common.AbstractMapper;
 import ru.practicum.compilation.model.Compilation;
-import ru.practicum.event.dto.EventCreateDto;
 import ru.practicum.event.dto.EventMapper;
 import ru.practicum.event.dto.EventShortDto;
-import ru.practicum.event.model.Event;
 
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -26,7 +24,7 @@ public class CompilationMapper extends AbstractMapper {
         Set<EventShortDto> eventShortDtoSet = null;
         if (nonNull(compilation.getEvents())) {
             eventShortDtoSet = compilation.getEvents().stream()
-                    .map(EventMapper::ToEventShortDto)
+                    .map(EventMapper::toEventShortDto)
                     .collect(Collectors.toUnmodifiableSet());
         }
 

@@ -26,7 +26,7 @@ public class EventCreateDto {
     private String description;
     @NotNull
     @JsonProperty("category")
-    private Long category_id;
+    private Long categoryId;
     @NotNull
     private LocalDateTime eventDate;
     private Location location;

@@ -38,7 +38,7 @@ public class EventServiceImpl implements EventService {
     @Override
     public EventFullDto add(long userId, EventCreateDto eventCreateDto) {
         final User initiator = userDao.getUser(userId);
-        final Category category = categoryDao.getCategory(eventCreateDto.getCategory_id());
+        final Category category = categoryDao.getCategory(eventCreateDto.getCategoryId());
 
         validateEventDate(eventCreateDto.getEventDate());
 
@@ -50,7 +50,7 @@ public class EventServiceImpl implements EventService {
 
         newEvent = eventDao.save(newEvent);
 
-        return EventMapper.ToEventFullDto(newEvent);
+        return EventMapper.toEventFullDto(newEvent);
     }
 
     @Override
@@ -69,14 +69,14 @@ public class EventServiceImpl implements EventService {
         eventFromDB.setState(newState);
 
         // Категорию меняю вручную.
-        final Category category = categoryDao.getCategory(eventUpdateDto.getCategory_id());
+        final Category category = categoryDao.getCategory(eventUpdateDto.getCategoryId());
         eventFromDB.setCategory(category);
 
         eventFromDB = eventDao.save(eventFromDB);
 
         // ToDo ?
         // Получение и установка данных из статистики и заявок.
-        final EventFullDto eventFullDto = EventMapper.ToEventFullDto(eventFromDB);
+        final EventFullDto eventFullDto = EventMapper.toEventFullDto(eventFromDB);
 
         return eventFullDto;
     }
@@ -97,14 +97,14 @@ public class EventServiceImpl implements EventService {
         eventFromDB.setState(newState);
 
         // Категорию меняю вручную.
-        final Category category = categoryDao.getCategory(eventUpdateDto.getCategory_id());
+        final Category category = categoryDao.getCategory(eventUpdateDto.getCategoryId());
         eventFromDB.setCategory(category);
 
         eventFromDB = eventDao.save(eventFromDB);
 
         // ToDo ?
         // Получение и установка данных из статистики и заявок.
-        final EventFullDto eventFullDto = EventMapper.ToEventFullDto(eventFromDB);
+        final EventFullDto eventFullDto = EventMapper.toEventFullDto(eventFromDB);
 
         return eventFullDto;
     }
@@ -112,7 +112,7 @@ public class EventServiceImpl implements EventService {
     @Override
     public EventFullDto getEventByUser(long userId, long eventId) {
         final Event event = eventDao.getEventByUser(eventId, userId);
-        final EventFullDto eventFullDto = EventMapper.ToEventFullDto(event);
+        final EventFullDto eventFullDto = EventMapper.toEventFullDto(event);
 
         // ToDo ?
         // Получение и установка данных из статистики и заявок.
@@ -123,7 +123,7 @@ public class EventServiceImpl implements EventService {
     @Override
     public EventFullDto getEvent(long id) {
         final Event event = eventDao.getEvent(id);
-        final EventFullDto eventFullDto = EventMapper.ToEventFullDto(event);
+        final EventFullDto eventFullDto = EventMapper.toEventFullDto(event);
 
         // Получение и установка данных из статистики и заявок.
         eventFullDto.setConfirmedRequests(requestDao.getConfirmedRequestsCount(id));
@@ -152,7 +152,7 @@ public class EventServiceImpl implements EventService {
         // ToDo ???
         // Получение и установка данных из статистики и заявок
 
-        final List<EventFullDto> result = searchedEvents.stream().map(EventMapper::ToEventFullDto).collect(toUnmodifiableList());
+        final List<EventFullDto> result = searchedEvents.stream().map(EventMapper::toEventFullDto).collect(toUnmodifiableList());
         return result;
     }
 
@@ -189,7 +189,7 @@ public class EventServiceImpl implements EventService {
             filteredEvents.sort(Comparator.comparingLong(Event::getViews));
         }
 
-        return filteredEvents.stream().map(EventMapper::ToEventShortDto).collect(toUnmodifiableList());
+        return filteredEvents.stream().map(EventMapper::toEventShortDto).collect(toUnmodifiableList());
     }
 
     @Override
@@ -199,7 +199,7 @@ public class EventServiceImpl implements EventService {
 
         final Pageable pageable = OffsetPageableValidator.validateAndGet(from, size);
         final List<Event> events = eventDao.getEventsByUser(userId, pageable);
-        final List<EventFullDto> eventFullDtoList = events.stream().map(EventMapper::ToEventFullDto).collect(toUnmodifiableList());
+        final List<EventFullDto> eventFullDtoList = events.stream().map(EventMapper::toEventFullDto).collect(toUnmodifiableList());
 
         // ToDo ?
         // Получение и установка данных из статистики и заявок.

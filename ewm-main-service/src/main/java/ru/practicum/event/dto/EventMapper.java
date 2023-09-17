@@ -23,7 +23,7 @@ public class EventMapper extends AbstractMapper {
                 .build();
     }
 
-    public EventFullDto ToEventFullDto(Event event) {
+    public EventFullDto toEventFullDto(Event event) {
         final UserDto initiator = UserMapper.toUserDto(event.getInitiator());
         final CategoryDto category = CategoryMapper.toCategoryDto(event.getCategory());
 
@@ -45,7 +45,7 @@ public class EventMapper extends AbstractMapper {
                 .build();
     }
 
-    public EventShortDto ToEventShortDto(Event event) {
+    public EventShortDto toEventShortDto(Event event) {
         final UserDto initiator = UserMapper.toUserDto(event.getInitiator());
         final CategoryDto category = CategoryMapper.toCategoryDto(event.getCategory());
 
@@ -60,20 +60,6 @@ public class EventMapper extends AbstractMapper {
                 .category(category)
                 .build();
     }
-
-//    public Event updateIfDifferent(final Event event, final EventCreateDto eventWithChanges) {
-//        return Event.builder()
-//                .id(event.getId())
-//                .title(getChanged(event.getTitle(), eventWithChanges.getTitle()))
-//                .description(getChanged(event.getDescription(), eventWithChanges.getDescription()))
-//                .annotation(getChanged(event.getAnnotation(), eventWithChanges.getAnnotation()))
-//                .isPaid(getChanged(event.isPaid(), eventWithChanges.isPaid()))
-//                .eventDate(getChanged(event.getEventDate(), eventWithChanges.getEventDate()))
-//                .participantLimit(getChanged(event.getParticipantLimit(), eventWithChanges.getParticipantLimit()))
-//                .isModerationRequired(getChanged(event.isModerationRequired(), eventWithChanges.isModerationRequired()))
-//                .location(getChanged(event.getLocation(), eventWithChanges.getLocation()))
-//                .build();
-//    }
 
     public void updateIfDifferent(Event event, final EventCreateDto eventWithChanges) {
         event.setTitle(getChanged(event.getTitle(), eventWithChanges.getTitle()));
