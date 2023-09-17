@@ -18,13 +18,16 @@ import ru.practicum.dto.EndpointStatsDto;
 
 import java.net.URI;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Optional;
+
+import static ru.practicum.common.Utils.DATE_PARAM_FORMAT_PATTERN;
 
 @Component
 @Slf4j
 public class StatsClient {
-    private static final String STATS_SERVER_BASE_URL = "http://localhost:9090";
+    private static final String STATS_SERVER_BASE_URL = "http://stats-server:9090";
     private final RestTemplate restTemplate;
     private final HttpHeaders headers = new HttpHeaders();
     private final ObjectMapper objectMapper;
@@ -65,14 +68,17 @@ public class StatsClient {
     public ResponseEntity<List<EndpointStatsDto>> callEndpointStats(LocalDateTime start, LocalDateTime end, List<String> uris, Boolean unique) {
         final ParameterizedTypeReference<List<EndpointStatsDto>> responseType = new ParameterizedTypeReference<>() {
         };
-        final URI uri = UriComponentsBuilder.newInstance()
-                .host(STATS_SERVER_BASE_URL)
+
+        final DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern(DATE_PARAM_FORMAT_PATTERN);
+        final URI uri = UriComponentsBuilder
+                .fromHttpUrl(STATS_SERVER_BASE_URL)
                 .path("/stats")
-                .queryParam("start", start)
-                .queryParam("end", end)
+                .queryParam("start", start.format(dateTimeFormatter))
+                .queryParam("end", end.format(dateTimeFormatter))
                 .queryParamIfPresent("uris", Optional.of(uris))
                 .queryParamIfPresent("unique", Optional.of(unique))
-                .build().toUri();
+                .build()
+                .toUri();
 
         ResponseEntity<List<EndpointStatsDto>> response = null;
         try {
