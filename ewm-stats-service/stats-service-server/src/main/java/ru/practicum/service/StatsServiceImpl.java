@@ -3,6 +3,7 @@ package ru.practicum.service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import ru.practicum.common.ValidationParams;
 import ru.practicum.dto.EndpointHitInfoDto;
 import ru.practicum.dto.EndpointStatsDto;
 import ru.practicum.model.EndpointHitInfo;
@@ -27,13 +28,7 @@ public class StatsServiceImpl implements StatsService {
     @Transactional(readOnly = true)
     @Override
     public List<EndpointStatsDto> getStatistics(LocalDateTime start, LocalDateTime end, List<String> uris, Boolean unique) {
-        validateStatsDateParams(start, end);
+        ValidationParams.validateStartEndDate(start, end);
         return daoEndpointHitInfo.getStatistics(start, end, uris, unique);
-    }
-
-    private void validateStatsDateParams(LocalDateTime start, LocalDateTime end) {
-        if (start.isAfter(end)) {
-            throw new IllegalArgumentException(String.format("start - %s не может быть позже end - %s!", start, end));
-        }
     }
 }

@@ -8,6 +8,8 @@ import ru.practicum.category.model.Category;
 import ru.practicum.category.repository.CategoryDao;
 import ru.practicum.common.OffsetPageableValidator;
 import ru.practicum.common.StatsClientWrapper;
+import ru.practicum.common.ValidationParams;
+import ru.practicum.common.exception.NotFoundException;
 import ru.practicum.dto.EndpointStatsDto;
 import ru.practicum.event.dto.*;
 import ru.practicum.event.model.*;
@@ -150,6 +152,8 @@ public class EventServiceImpl implements EventService {
                                      LocalDateTime end,
                                      Integer from,
                                      Integer size) {
+        ValidationParams.validateStartEndDate(start, end);
+
         final Pageable pageable = OffsetPageableValidator.validateAndGet(from, size);
         final List<Event> searchedEvents = eventDao.searchEvents(userIds, states, categoryIds, start, end, pageable);
 
@@ -174,6 +178,8 @@ public class EventServiceImpl implements EventService {
                                                   EventSort sort,
                                                   Integer from,
                                                   Integer size) {
+        ValidationParams.validateStartEndDate(start, end);
+
         final Pageable pageable = OffsetPageableValidator.validateAndGet(from, size);
         // если в запросе не указан диапазон дат [rangeStart-rangeEnd], то нужно выгружать события, которые произойдут позже текущей даты и времени
         if (isNull(start) && isNull(end)) {
