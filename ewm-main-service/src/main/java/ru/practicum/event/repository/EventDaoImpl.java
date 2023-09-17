@@ -81,10 +81,19 @@ public class EventDaoImpl implements EventDao {
         final QEvent qEvent = QEvent.event;
 
         BooleanExpression whereExpression = qEvent.initiator().id.in(userIds);
-        whereExpression = whereExpression.and(qEvent.state.in(states));
-        whereExpression = whereExpression.and(qEvent.category().id.in(categoryIds));
-        whereExpression = whereExpression.and(qEvent.eventDate.after(start));
-        whereExpression = whereExpression.and(qEvent.eventDate.before(end));
+
+        if (nonNull(states)) {
+            whereExpression = whereExpression.and(qEvent.state.in(states));
+        }
+        if (nonNull(categoryIds)) {
+            whereExpression = whereExpression.and(qEvent.category().id.in(categoryIds));
+        }
+        if (nonNull(start)) {
+            whereExpression = whereExpression.and(qEvent.eventDate.after(start));
+        }
+        if (nonNull(end)) {
+            whereExpression = whereExpression.and(qEvent.eventDate.before(end));
+        }
 
         final JPAQuery<Event> searchQuery = queryFactory.selectFrom(qEvent).where(whereExpression);
 
@@ -110,12 +119,23 @@ public class EventDaoImpl implements EventDao {
         final QEvent qEvent = QEvent.event;
 
         BooleanExpression whereExpression = qEvent.state.eq(EventState.PUBLISHED);
-        whereExpression = whereExpression.and(qEvent.annotation.containsIgnoreCase(text)
-                .or(qEvent.description.containsIgnoreCase(text)));
-        whereExpression = whereExpression.and(qEvent.category().id.in(categoryIds));
-        whereExpression = whereExpression.and(qEvent.isPaid.eq(paid));
-        whereExpression = whereExpression.and(qEvent.eventDate.after(start));
-        whereExpression = whereExpression.and(qEvent.eventDate.before(end));
+
+        if (nonNull(text)) {
+            whereExpression = whereExpression.and(qEvent.annotation.containsIgnoreCase(text)
+                    .or(qEvent.description.containsIgnoreCase(text)));
+        }
+        if (nonNull(categoryIds)) {
+            whereExpression = whereExpression.and(qEvent.category().id.in(categoryIds));
+        }
+        if (nonNull(paid)) {
+            whereExpression = whereExpression.and(qEvent.isPaid.eq(paid));
+        }
+        if (nonNull(start)) {
+            whereExpression = whereExpression.and(qEvent.eventDate.after(start));
+        }
+        if (nonNull(end)) {
+            whereExpression = whereExpression.and(qEvent.eventDate.before(end));
+        }
 
         JPAQuery<Event> searchQuery = queryFactory.selectFrom(qEvent)
                 .where(whereExpression);
