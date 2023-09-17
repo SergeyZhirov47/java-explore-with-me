@@ -55,7 +55,9 @@ public class EventServiceImpl implements EventService {
 
     @Override
     public EventFullDto edit(long userId, long eventId, EventUpdateByUserDto eventUpdateDto) {
-        validateEventDate(eventUpdateDto.getEventDate());
+        if (nonNull(eventUpdateDto.getEventDate())) {
+            validateEventDate(eventUpdateDto.getEventDate());
+        }
 
         Event eventFromDB = eventDao.getEventByUser(eventId, userId);
 
@@ -83,7 +85,9 @@ public class EventServiceImpl implements EventService {
 
     @Override
     public EventFullDto edit(long eventId, EventUpdateByAdminDto eventUpdateDto) {
-        validateEventDate(eventUpdateDto.getEventDate());
+        if (nonNull(eventUpdateDto.getEventDate())) {
+            validateEventDate(eventUpdateDto.getEventDate());
+        }
 
         Event eventFromDB = eventDao.getEvent(eventId);
 
