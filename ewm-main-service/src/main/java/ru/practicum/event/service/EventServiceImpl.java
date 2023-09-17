@@ -71,8 +71,10 @@ public class EventServiceImpl implements EventService {
         eventFromDB.setState(newState);
 
         // Категорию меняю вручную.
-        final Category category = categoryDao.getCategory(eventUpdateDto.getCategoryId());
-        eventFromDB.setCategory(category);
+        if (nonNull(eventUpdateDto.getCategoryId())) {
+            final Category category = categoryDao.getCategory(eventUpdateDto.getCategoryId());
+            eventFromDB.setCategory(category);
+        }
 
         eventFromDB = eventDao.save(eventFromDB);
 
@@ -101,8 +103,10 @@ public class EventServiceImpl implements EventService {
         eventFromDB.setState(newState);
 
         // Категорию меняю вручную.
-        final Category category = categoryDao.getCategory(eventUpdateDto.getCategoryId());
-        eventFromDB.setCategory(category);
+        if (nonNull(eventUpdateDto.getCategoryId())) {
+            final Category category = categoryDao.getCategory(eventUpdateDto.getCategoryId());
+            eventFromDB.setCategory(category);
+        }
 
         eventFromDB = eventDao.save(eventFromDB);
 
