@@ -18,6 +18,8 @@ public interface EventService {
 
     EventFullDto getEvent(long id);
 
+    EventFullDto getEventOnlyIfPublished(long id);
+
     List<EventFullDto> search(List<Long> userIds,
                               List<EventState> states,
                               List<Long> categoryIds,

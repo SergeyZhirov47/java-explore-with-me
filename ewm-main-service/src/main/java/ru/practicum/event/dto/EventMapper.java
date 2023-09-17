@@ -42,6 +42,8 @@ public class EventMapper extends AbstractMapper {
                 .location(event.getLocation())
                 .state(event.getState())
                 .publishedOn(event.getPublishedOn())
+                .views(event.getViews())
+                .confirmedRequests(event.getConfirmedRequests())
                 .build();
     }
 
@@ -58,6 +60,8 @@ public class EventMapper extends AbstractMapper {
                 .eventDate(event.getEventDate())
                 .initiator(initiator)
                 .category(category)
+                .views(event.getViews())
+                .confirmedRequests(event.getConfirmedRequests())
                 .build();
     }
 

@@ -71,7 +71,7 @@ public class EventPublicController {
     public EventFullDto getEventFullInfo(@PathVariable long id, HttpServletRequest request) throws JsonProcessingException {
         log.info(String.format("GET /events/{id}, {id} = %s", id));
 
-        final EventFullDto eventFullDto = eventService.getEvent(id);
+        final EventFullDto eventFullDto = eventService.getEventOnlyIfPublished(id);
         clientWrapper.saveHit(request);
 
         return eventFullDto;

@@ -133,12 +133,36 @@ public class EventServiceImpl implements EventService {
     @Override
     public EventFullDto getEvent(long id) {
         final Event event = eventDao.getEvent(id);
+
+        // Получение и установка данных из статистики и заявок.
+        addViewsAndConfirmedRequests(event);
+
         final EventFullDto eventFullDto = EventMapper.toEventFullDto(event);
 
         // Получение и установка данных из статистики и заявок.
-        eventFullDto.setConfirmedRequests(requestDao.getConfirmedRequestsCount(id));
-        final List<EndpointStatsDto> statsDtoList = getEventViewsStat(id);
-        eventFullDto.setViews(statsDtoList.get(0).getHits());
+//        eventFullDto.setConfirmedRequests(requestDao.getConfirmedRequestsCount(id));
+//        final List<EndpointStatsDto> statsDtoList = getEventViewsStat(id);
+//        eventFullDto.setViews(statsDtoList.isEmpty() ? 0 : statsDtoList.get(0).getHits());
+
+        return eventFullDto;
+    }
+
+    @Override
+    public EventFullDto getEventOnlyIfPublished(long id) {
+        final Event event = eventDao.getEvent(id);
+        if (!event.getState().equals(EventState.PUBLISHED)) {
+            throw new NotFoundException(String.format("Событие с id = %s не найдено!", id));
+        }
+
+        // Получение и установка данных из статистики и заявок.
+        addViewsAndConfirmedRequests(event);
+
+        final EventFullDto eventFullDto = EventMapper.toEventFullDto(event);
+
+        // Получение и установка данных из статистики и заявок.
+//        eventFullDto.setConfirmedRequests(requestDao.getConfirmedRequestsCount(id));
+//        final List<EndpointStatsDto> statsDtoList = getEventViewsStat(id);
+//        eventFullDto.setViews(statsDtoList.isEmpty() ? 0 : statsDtoList.get(0).getHits());
 
         return eventFullDto;
     }
@@ -236,6 +260,18 @@ public class EventServiceImpl implements EventService {
         if (!(state.equals(EventState.PENDING) || state.equals(EventState.CANCELED))) {
             throw new IllegalStateException("Изменять можно только отмененные события или события в состоянии ожидания модерации!");
         }
+    }
+
+    private void addViewsAndConfirmedRequests(Event event) {
+        if (isNull(event)) {
+            return;
+        }
+
+        final long eventId = event.getId();
+
+        event.setConfirmedRequests(requestDao.getConfirmedRequestsCount(eventId));
+        final List<EndpointStatsDto> statsDtoList = getEventViewsStat(eventId);
+        event.setViews(statsDtoList.isEmpty() ? 0 : statsDtoList.get(0).getHits());
     }
 
     private void addViewsAndConfirmedRequests(List<Event> events) {
