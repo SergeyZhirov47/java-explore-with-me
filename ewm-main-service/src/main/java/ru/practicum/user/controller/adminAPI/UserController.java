@@ -28,7 +28,7 @@ public class UserController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public UserDto create(@Valid UserCreateDto userCreateDto) {
+    public UserDto create(@Valid @RequestBody UserCreateDto userCreateDto) {
         log.info(String.format("POST /admin/users, body = %s", userCreateDto));
         return userService.create(userCreateDto);
     }
