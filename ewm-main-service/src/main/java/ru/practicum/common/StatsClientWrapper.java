@@ -11,6 +11,8 @@ import javax.servlet.http.HttpServletRequest;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import static java.util.Objects.isNull;
+
 @Service
 @RequiredArgsConstructor
 public class StatsClientWrapper {
@@ -23,6 +25,13 @@ public class StatsClientWrapper {
     }
 
     public List<EndpointStatsDto> getStats(LocalDateTime start, LocalDateTime end, List<String> uris, Boolean unique) {
+        if (isNull(start)) {
+            start = LocalDateTime.of(1900, 1, 1, 0, 0, 0);
+        }
+        if (isNull(end)) {
+            end = LocalDateTime.of(3000, 12, 31, 23, 59, 59);
+        }
+
         final ResponseEntity<List<EndpointStatsDto>> response = statsClient.callEndpointStats(start, end, uris, unique);
         return response.getBody();
     }
