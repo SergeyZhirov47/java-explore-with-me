@@ -56,6 +56,11 @@ public class EventDaoImpl implements EventDao {
     }
 
     @Override
+    public List<Event> getEvents(List<Long> ids) {
+        return eventRepository.findAllByIdIn(ids);
+    }
+
+    @Override
     public Event getEventByUser(long id, long userId) {
         final Optional<Event> eventOptional = eventRepository.findByIdAndInitiatorId(id, userId);
         return eventOptional.orElseThrow(() -> new NotFoundException(String.format("Не найдено событие с id = %s, которое разместил пользователь с id = %s", id, userId)));

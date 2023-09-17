@@ -15,6 +15,8 @@ public interface EventDao {
 
     Event getEvent(long id);
 
+    List<Event> getEvents(List<Long> ids);
+
     Event getEventByUser(long id, long userId);
 
     List<Event> getEventsByUser(long userId, Pageable pageable);
