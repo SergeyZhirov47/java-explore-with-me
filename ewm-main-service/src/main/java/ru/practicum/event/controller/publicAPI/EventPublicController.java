@@ -38,32 +38,33 @@ public class EventPublicController {
                                                   @RequestParam(defaultValue = "0") Integer from,
                                                   @RequestParam(defaultValue = "10") Integer size,
                                                   HttpServletRequest request) throws JsonProcessingException {
-        Map<String, Object> params = new HashMap<>();
-        params.put("text", text);
-        params.put("categories", categories);
-        params.put("paid", paid);
-        params.put("rangeStart", rangeStart);
-        params.put("rangeEnd", rangeEnd);
-        params.put("onlyAvailable", onlyAvailable);
-        params.put("sort", sort);
-        params.put("from", from);
-        params.put("size", size);
+//        Map<String, Object> params = new HashMap<>();
+//        params.put("text", text);
+//        params.put("categories", categories);
+//        params.put("paid", paid);
+//        params.put("rangeStart", rangeStart);
+//        params.put("rangeEnd", rangeEnd);
+//        params.put("onlyAvailable", onlyAvailable);
+//        params.put("sort", sort);
+//        params.put("from", from);
+//        params.put("size", size);
 
-        params = params.entrySet().stream()
-                .filter(p -> nonNull(p.getValue()))
-                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+//        params = params.entrySet().stream()
+//                .filter(p -> nonNull(p.getValue()))
+//                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+//
+//        StringBuilder uriStringBuilder = new StringBuilder("GET /events?");
+//        StringBuilder paramsStringBuilder = new StringBuilder();
+//        for (Map.Entry<String, Object> kv : params.entrySet()) {
+//            String paramNameStr = kv.getKey() + "={" + kv.getKey() + "}";
+//            String paramValueStr = kv.getKey() + " = " + kv.getValue().toString();
+//
+//            uriStringBuilder.append(paramNameStr);
+//            paramsStringBuilder.append(paramValueStr);
+//        }
 
-        StringBuilder uriStringBuilder = new StringBuilder("GET /events?");
-        StringBuilder paramsStringBuilder = new StringBuilder();
-        for (Map.Entry<String, Object> kv : params.entrySet()) {
-            String paramNameStr = kv.getKey() + "={" + kv.getKey() + "}";
-            String paramValueStr = kv.getKey() + " = " + kv.getValue().toString();
-
-            uriStringBuilder.append(paramNameStr);
-            paramsStringBuilder.append(paramValueStr);
-        }
-
-        log.info(uriStringBuilder + ", " + paramsStringBuilder);
+       // log.info(uriStringBuilder + ", " + paramsStringBuilder);
+        log.info("GET /events");
 
         final List<EventShortDto> publishedEvents = eventService.getPublishedEvents(text, categories, paid, rangeStart, rangeEnd, onlyAvailable, sort, from, size);
         clientWrapper.saveHit(request);
