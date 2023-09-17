@@ -2,6 +2,7 @@ package ru.practicum.request.controller.privateAPI;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.request.dto.RequestDto;
 import ru.practicum.request.service.RequestService;
@@ -22,6 +23,7 @@ public class RequestPrivateController {
     }
 
     @PostMapping
+    @ResponseStatus(HttpStatus.CREATED)
     public RequestDto add(@PathVariable long userId, @RequestParam long eventId) {
         log.info(String.format("POST /users/{userId}/requests/, {userId} = %s, {eventId} = %s", userId, eventId));
         return requestService.add(userId, eventId);
