@@ -2,6 +2,7 @@ package ru.practicum.request.repository;
 
 import org.springframework.data.domain.Sort;
 import ru.practicum.request.model.Request;
+import ru.practicum.request.model.RequestStatus;
 
 import java.util.List;
 import java.util.Map;
@@ -24,6 +25,8 @@ public interface RequestDao {
     void checkRequestExists(long id);
 
     int getParticipantCountInEvent(long eventId);
+
+    List<Request> findAllByEventIdAndStatus(long eventId, RequestStatus status);
 
     int getConfirmedRequestsCount(long eventId);
 

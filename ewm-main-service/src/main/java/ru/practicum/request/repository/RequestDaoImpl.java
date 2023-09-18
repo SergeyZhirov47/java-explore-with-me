@@ -77,9 +77,7 @@ public class RequestDaoImpl implements RequestDao {
         booleanBuilder.and(qRequest.event().id.eq(eventId));
         booleanBuilder.and(qRequest.event().initiator().id.eq(userId));
 
-        final List<Request> requestsInUserEvent = queryFactory.selectFrom(qRequest).where(booleanBuilder).fetch();
-        return requestsInUserEvent;
-        //return requestRepository.findAllByEventId(eventId);
+        return queryFactory.selectFrom(qRequest).where(booleanBuilder).fetch();
     }
 
     @Override
@@ -93,6 +91,11 @@ public class RequestDaoImpl implements RequestDao {
     public int getParticipantCountInEvent(long eventId) {
         return requestRepository.countAllByEventId(eventId);
         // return requestRepository.countAllByEventIdAndStatusIn(eventId, List.of(RequestStatus.PENDING, RequestStatus.CONFIRMED));
+    }
+
+    @Override
+    public List<Request> findAllByEventIdAndStatus(long eventId, RequestStatus status) {
+        return requestRepository.findAllByEventIdAndStatus(eventId, status);
     }
 
     @Override

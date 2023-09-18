@@ -1,6 +1,7 @@
 package ru.practicum.request.service;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -18,7 +19,6 @@ import ru.practicum.user.model.User;
 import ru.practicum.user.repository.UserDao;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -26,6 +26,7 @@ import static java.util.stream.Collectors.toUnmodifiableList;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class RequestServiceImpl implements RequestService {
     private final RequestDao requestDao;
     private final UserDao userDao;
@@ -51,25 +52,15 @@ public class RequestServiceImpl implements RequestService {
 
         if (event.getParticipantLimit() != 0) {
             // сколько пользователей захотело участвовать (у кого заявка в рассмотрении или одобрена)
-            int participantCount = requestDao.getParticipantCountInEvent(event.getId());
+            // int participantCount = requestDao.getParticipantCountInEvent(event.getId());
+            int participantCount = requestDao.getConfirmedRequestsCount(event.getId());
 
             if (participantCount == event.getParticipantLimit()) {
                 throw new IllegalStateException("Уже достигнут лимит на кол-во участников события!");
             }
         }
 
-        // event.getParticipantLimit() == 0
-        // final RequestStatus newRequestStatus = event.isModerationRequired() ? RequestStatus.PENDING : RequestStatus.CONFIRMED;
-        final RequestStatus newRequestStatus = event.getParticipantLimit() == 0 || !event.getIsModerationRequired() ? RequestStatus.CONFIRMED : RequestStatus.PENDING;
-
-//        if (event.isModerationRequired()) {
-//            if (event.getParticipantLimit() == 0) {
-//                newRequestStatus = RequestStatus.CONFIRMED;
-//            }
-//            newRequestStatus = RequestStatus.PENDING;
-//        } else {
-//            newRequestStatus = RequestStatus.CONFIRMED;
-//        }
+        final RequestStatus newRequestStatus = event.getParticipantLimit() == 0 ? RequestStatus.CONFIRMED : RequestStatus.PENDING;
 
         Request newRequest = Request.builder()
                 .requester(requester)
@@ -88,8 +79,6 @@ public class RequestServiceImpl implements RequestService {
         userDao.checkUserExists(userId);
         final Event event = eventDao.getEvent(eventId);
 
-        List<Request> confirmed = new ArrayList<>();
-        List<Request> rejected = new ArrayList<>();
         final EventRequestStatusUpdateResultDto resultDto = new EventRequestStatusUpdateResultDto();
 
         if (updateDataDto.getRequestIds().isEmpty()) {
@@ -103,58 +92,25 @@ public class RequestServiceImpl implements RequestService {
         final List<Request> requestList = requestDao.getRequests(updateDataDto.getRequestIds(), Sort.by("created"));
         final RequestStatus status = updateDataDto.getStatus();
 
-        // ToDo
-        // Может быть, что часть или всех заявок не будет (неверные id).
-        // Что будет делать? В любом случае исключение (если requestList.size() != updateDataDto.getRequestIds().size())
-
-        // статус можно изменить только у заявок, находящихся в состоянии ожидания (Ожидается код ошибки 409)
-//        final boolean isAllRequestsHasPendingStatus = requestList.stream().anyMatch(r -> !r.getStatus().equals(RequestStatus.PENDING));
-//        if (!isAllRequestsHasPendingStatus) {
-//            throw new IllegalStateException("Статус можно изменить только у заявок, находящихся в состоянии ожидания!");
-//        }
-
-        // если для события лимит заявок равен 0 или отключена пре-модерация заявок, то подтверждение заявок не требуется
-        if (event.getParticipantLimit() == 0) {
-            // Все утверждаем.
-            setRequestsStatus(requestList, RequestStatus.CONFIRMED);
-            confirmed = requestDao.saveAll(requestList);
-
-            resultDto.setRejectedRequests(Collections.emptyList());
-            resultDto.setConfirmedRequests(mapRequestsToDto(confirmed));
-
-            return resultDto;
-        }
-
         if (status.equals(RequestStatus.CONFIRMED)) {
-            // сколько пользователей захотело участвовать (у кого заявка в рассмотрении или одобрена)
-            int participantCount = requestDao.getParticipantCountInEvent(event.getId());
+            if (event.getParticipantLimit() == requestDao.getConfirmedRequestsCount(eventId)) {
+                throw new IllegalStateException("Нельзя принять заявки, если достигнут лимит участников!");
+            }
 
-            // нельзя подтвердить заявку, если уже достигнут лимит по заявкам на данное событие (Ожидается код ошибки 409)
-//            if (participantCount == event.getParticipantLimit()) {
-//                throw new IllegalStateException("Заявки нельзя утвердить. Достигнут лимит по заявкам на данное событие!");
-//            }
-
-            // если при подтверждении данной заявки, лимит заявок для события исчерпан, то все неподтверждённые заявки необходимо отклонить
-            // ToDo
-            // неподтверждённые отклонить? - это только те, которые в текущем запросе пришли или вообще все неподтвержденные для данного события?
-
-            // теперь рассчитываем сколько можем подтвердить, а остальные отклоняем.
-            final int canConfirmCount = event.getParticipantLimit() - participantCount;
-
-            confirmed = requestList.stream().limit(canConfirmCount).collect(toUnmodifiableList());
-            rejected = requestList.stream().skip(canConfirmCount).collect(toUnmodifiableList());
-
-            setRequestsStatus(confirmed, RequestStatus.CONFIRMED);
-            setRequestsStatus(rejected, RequestStatus.REJECTED);
+            setRequestsStatus(requestList, RequestStatus.CONFIRMED);
+            requestDao.saveAll(requestList);
         } else if (status.equals(RequestStatus.REJECTED)) {
-            // Все отклоняем.
+            final boolean hasConfirmed = requestList.stream().anyMatch(r -> r.getStatus().equals(RequestStatus.CONFIRMED));
+            if (hasConfirmed) {
+                throw new IllegalStateException("Нельзя отменить уже подтвержденную заявку!");
+            }
+
             setRequestsStatus(requestList, RequestStatus.REJECTED);
-            rejected = requestList;
-            confirmed = Collections.emptyList();
+            requestDao.saveAll(requestList);
         }
 
-        confirmed = requestDao.saveAll(confirmed);
-        rejected = requestDao.saveAll(rejected);
+        final List<Request> confirmed = requestDao.findAllByEventIdAndStatus(eventId, RequestStatus.CONFIRMED);
+        final List<Request> rejected = requestDao.findAllByEventIdAndStatus(eventId, RequestStatus.REJECTED);
 
         resultDto.setRejectedRequests(mapRequestsToDto(rejected));
         resultDto.setConfirmedRequests(mapRequestsToDto(confirmed));
