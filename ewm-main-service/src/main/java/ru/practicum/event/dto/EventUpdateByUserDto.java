@@ -12,7 +12,7 @@ import ru.practicum.event.model.UpdateEventUserAction;
 @SuperBuilder
 @Jacksonized
 @Data
-@ToString(callSuper=true)
+@ToString(callSuper = true)
 @AllArgsConstructor
 public class EventUpdateByUserDto extends EventUpdateDto {
     private UpdateEventUserAction stateAction;

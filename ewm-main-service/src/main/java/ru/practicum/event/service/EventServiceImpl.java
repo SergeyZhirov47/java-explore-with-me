@@ -1,6 +1,7 @@
 package ru.practicum.event.service;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -8,6 +9,7 @@ import ru.practicum.category.model.Category;
 import ru.practicum.category.repository.CategoryDao;
 import ru.practicum.common.OffsetPageableValidator;
 import ru.practicum.common.StatsClientWrapper;
+import ru.practicum.common.Utils;
 import ru.practicum.common.ValidationParams;
 import ru.practicum.common.exception.NotFoundException;
 import ru.practicum.dto.EndpointStatsDto;
@@ -18,6 +20,7 @@ import ru.practicum.request.repository.RequestDao;
 import ru.practicum.user.model.User;
 import ru.practicum.user.repository.UserDao;
 
+import javax.validation.ConstraintViolation;
 import javax.validation.Validation;
 import javax.validation.Validator;
 import javax.validation.ValidatorFactory;
@@ -32,6 +35,7 @@ import static java.util.stream.Collectors.*;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class EventServiceImpl implements EventService {
     private final EventDao eventDao;
     private final UserDao userDao;
@@ -59,19 +63,15 @@ public class EventServiceImpl implements EventService {
 
     @Override
     public EventFullDto edit(long userId, long eventId, EventUpdateByUserDto eventUpdateDto) {
-        if (nonNull(eventUpdateDto.getEventDate())) {
-            validateEventDate(eventUpdateDto.getEventDate());
-        }
+        validateNotNullFields(eventUpdateDto);
 
         Event eventFromDB = eventDao.getEventByUser(eventId, userId);
-
         validateEventStateForUpdate(eventFromDB.getState());
 
         // Обновление.
         EventMapper.updateIfDifferent(eventFromDB, eventUpdateDto);
 
         // Устанавливаем новое состояние.
-        final EventState oldState = eventFromDB.getState();
         if (nonNull(eventUpdateDto.getStateAction())) {
             final EventState newState = mapToEventState(eventUpdateDto.getStateAction());
             eventFromDB.setState(newState);
@@ -85,23 +85,15 @@ public class EventServiceImpl implements EventService {
 
         eventFromDB = eventDao.save(eventFromDB);
 
-        // ToDo ?
-        // Получение и установка данных из статистики и заявок.
         final EventFullDto eventFullDto = EventMapper.toEventFullDto(eventFromDB);
-
         return eventFullDto;
     }
 
     @Override
     public EventFullDto edit(long eventId, EventUpdateByAdminDto eventUpdateDto) {
-        testValidate(eventUpdateDto);
-
-        if (nonNull(eventUpdateDto.getEventDate())) {
-            validateEventDate(eventUpdateDto.getEventDate());
-        }
+        validateNotNullFields(eventUpdateDto);
 
         Event eventFromDB = eventDao.getEvent(eventId);
-
         validateEventStateForUpdate(eventFromDB.getState());
 
         // Обновление.
@@ -128,22 +120,14 @@ public class EventServiceImpl implements EventService {
 
         eventFromDB = eventDao.save(eventFromDB);
 
-        // ToDo ?
-        // Получение и установка данных из статистики и заявок.
         final EventFullDto eventFullDto = EventMapper.toEventFullDto(eventFromDB);
-
         return eventFullDto;
     }
 
     @Override
     public EventFullDto getEventByUser(long userId, long eventId) {
         final Event event = eventDao.getEventByUser(eventId, userId);
-        final EventFullDto eventFullDto = EventMapper.toEventFullDto(event);
-
-        // ToDo ?
-        // Получение и установка данных из статистики и заявок.
-
-        return eventFullDto;
+        return EventMapper.toEventFullDto(event);
     }
 
     @Override
@@ -153,14 +137,7 @@ public class EventServiceImpl implements EventService {
         // Получение и установка данных из статистики и заявок.
         addViewsAndConfirmedRequests(event);
 
-        final EventFullDto eventFullDto = EventMapper.toEventFullDto(event);
-
-        // Получение и установка данных из статистики и заявок.
-//        eventFullDto.setConfirmedRequests(requestDao.getConfirmedRequestsCount(id));
-//        final List<EndpointStatsDto> statsDtoList = getEventViewsStat(id);
-//        eventFullDto.setViews(statsDtoList.isEmpty() ? 0 : statsDtoList.get(0).getHits());
-
-        return eventFullDto;
+        return EventMapper.toEventFullDto(event);
     }
 
     @Override
@@ -173,14 +150,7 @@ public class EventServiceImpl implements EventService {
         // Получение и установка данных из статистики и заявок.
         addViewsAndConfirmedRequests(event);
 
-        final EventFullDto eventFullDto = EventMapper.toEventFullDto(event);
-
-        // Получение и установка данных из статистики и заявок.
-//        eventFullDto.setConfirmedRequests(requestDao.getConfirmedRequestsCount(id));
-//        final List<EndpointStatsDto> statsDtoList = getEventViewsStat(id);
-//        eventFullDto.setViews(statsDtoList.isEmpty() ? 0 : statsDtoList.get(0).getHits());
-
-        return eventFullDto;
+        return EventMapper.toEventFullDto(event);
     }
 
     @Override
@@ -201,11 +171,7 @@ public class EventServiceImpl implements EventService {
             return Collections.emptyList();
         }
 
-        // ToDo ???
-        // Получение и установка данных из статистики и заявок
-
-        final List<EventFullDto> result = searchedEvents.stream().map(EventMapper::toEventFullDto).collect(toUnmodifiableList());
-        return result;
+        return searchedEvents.stream().map(EventMapper::toEventFullDto).collect(toUnmodifiableList());
     }
 
     @Override
@@ -253,15 +219,14 @@ public class EventServiceImpl implements EventService {
 
         final Pageable pageable = OffsetPageableValidator.validateAndGet(from, size);
         final List<Event> events = eventDao.getEventsByUser(userId, pageable);
-        final List<EventFullDto> eventFullDtoList = events.stream().map(EventMapper::toEventFullDto).collect(toUnmodifiableList());
-
-        // ToDo ?
-        // Получение и установка данных из статистики и заявок.
-
-        return eventFullDtoList;
+        return events.stream().map(EventMapper::toEventFullDto).collect(toUnmodifiableList());
     }
 
     private void validateEventDate(LocalDateTime eventDate) {
+        if (isNull(eventDate)) {
+            return;
+        }
+
         final long hoursDelay = 2L;
 
         final LocalDateTime now = LocalDateTime.now();
@@ -279,34 +244,33 @@ public class EventServiceImpl implements EventService {
     }
 
     private void validateTitle(String title) {
-        validateStringLength(title, 3, 120);
+        Utils.validateLengthOfNullableString(title, 3, 120);
     }
 
     private void validateAnnotation(String annotation) {
-        validateStringLength(annotation, 20, 2000);
+        Utils.validateLengthOfNullableString(annotation, 20, 2000);
     }
 
     private void validateDescription(String description) {
-        validateStringLength(description, 20, 7000);
+        Utils.validateLengthOfNullableString(description, 20, 7000);
     }
 
-    private void validateStringLength(String str, int min, int max) {
-        final int length = str.length();
-
-        if (length < min || length > max) {
-            throw new IllegalArgumentException();
-        }
+    private void validateNotNullFields(EventUpdateDto eventUpdateDto) {
+        validateTitle(eventUpdateDto.getTitle());
+        validateAnnotation(eventUpdateDto.getAnnotation());
+        validateDescription(eventUpdateDto.getDescription());
+        validateEventDate(eventUpdateDto.getEventDate());
     }
 
-    public void testValidate(EventUpdateByAdminDto eventUpdateByAdminDto) {
-        ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
-        Validator validator = factory.getValidator();
+    private void testValidate(EventUpdateByAdminDto eventUpdateByAdminDto) {
+        final ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
+        final Validator validator = factory.getValidator();
 
         // Получаем все поля объекта
-        Field[] fields = EventUpdateByAdminDto.class.getDeclaredFields();
+        final Field[] fields = EventUpdateByAdminDto.class.getDeclaredFields();
 
         // Создаем список полей для валидации
-        List<Field> fieldsToValidate = new ArrayList<>();
+        final List<Field> fieldsToValidate = new ArrayList<>();
 
         for (Field field : fields) {
             field.setAccessible(true);
@@ -315,26 +279,25 @@ public class EventServiceImpl implements EventService {
             try {
                 if (field.get(eventUpdateByAdminDto) != null || field.isAnnotationPresent(NotNull.class)) {
                     fieldsToValidate.add(field);
+                    log.info(field + " будет проверено");
                 }
             } catch (IllegalAccessException e) {
+                log.warn("внутри testValidate что-то случилось");
                 throw new RuntimeException(e);
             }
         }
 
         // Валидируем поля
         for (Field field : fieldsToValidate) {
-            Set<javax.validation.ConstraintViolation<EventUpdateByAdminDto>> violations = validator.validateProperty(eventUpdateByAdminDto, field.getName());
+            final Set<ConstraintViolation<EventUpdateByAdminDto>> violations = validator.validateProperty(eventUpdateByAdminDto, field.getName());
 
             if (!violations.isEmpty()) {
-                throw new IllegalArgumentException();
-
-                // Обрабатываем ошибки валидации
-//                for (javax.validation.ConstraintViolation<EventUpdateByAdminDto> violation : violations) {
-//                    //System.out.println(violation.getMessage());
-//                    throw new IllegalArgumentException();
-//                }
+                log.info(field.getName() + " поле не прошло валидацию");
+                throw new IllegalArgumentException(field.getName() + " поле не прошло валидацию");
             }
         }
+
+        log.info(eventUpdateByAdminDto + " успешно прошел валидацию");
     }
 
     private void addViewsAndConfirmedRequests(Event event) {
