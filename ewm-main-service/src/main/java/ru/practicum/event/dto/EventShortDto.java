@@ -27,7 +27,7 @@ public class EventShortDto {
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = DATE_PARAM_FORMAT_PATTERN)
     private LocalDateTime eventDate;
     @JsonProperty("paid")
-    private boolean isPaid;
+    private Boolean isPaid;
     private long confirmedRequests;
     private long views;
 }

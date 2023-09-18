@@ -42,9 +42,9 @@ public class EventCreateDto {
     @NotNull
     private Location location;
     @JsonProperty("paid")
-    private boolean isPaid = false;
-    private int participantLimit = 0;
+    private Boolean isPaid = false;
+    private Integer participantLimit = 0;
     @JsonSetter(nulls = Nulls.SKIP)
     @JsonProperty("requestModeration")
-    private boolean isModerationRequired = true;
+    private Boolean isModerationRequired = true;
 }

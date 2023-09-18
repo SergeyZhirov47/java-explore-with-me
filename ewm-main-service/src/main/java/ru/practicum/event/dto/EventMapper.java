@@ -15,11 +15,11 @@ public class EventMapper extends AbstractMapper {
                 .title(eventCreateDto.getTitle())
                 .description(eventCreateDto.getDescription())
                 .annotation(eventCreateDto.getAnnotation())
-                .isPaid(eventCreateDto.isPaid())
+                .isPaid(eventCreateDto.getIsPaid())
                 .eventDate(eventCreateDto.getEventDate())
                 .location(eventCreateDto.getLocation())
                 .participantLimit(eventCreateDto.getParticipantLimit())
-                .isModerationRequired(eventCreateDto.isModerationRequired())
+                .isModerationRequired(eventCreateDto.getIsModerationRequired())
                 .build();
     }
 
@@ -66,7 +66,7 @@ public class EventMapper extends AbstractMapper {
     }
 
     public void updateIfDifferent(Event event, final EventUpdateDto eventWithChanges) {
-        // Cостояние меняем согласно логике
+        // Состояние меняем согласно логике
         event.setTitle(getChanged(event.getTitle(), eventWithChanges.getTitle()));
         event.setDescription(getChanged(event.getDescription(), eventWithChanges.getDescription()));
         event.setAnnotation(getChanged(event.getAnnotation(), eventWithChanges.getAnnotation()));

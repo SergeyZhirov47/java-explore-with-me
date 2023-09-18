@@ -30,10 +30,10 @@ public class EventFullDto {
     private LocalDateTime eventDate;
     private Location location;
     @JsonProperty("paid")
-    private boolean isPaid;
-    private int participantLimit;
+    private Boolean isPaid;
+    private Integer participantLimit;
     @JsonProperty("requestModeration")
-    private boolean isModerationRequired;
+    private Boolean isModerationRequired;
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = DATE_PARAM_FORMAT_PATTERN)
     private LocalDateTime createdOn;
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = DATE_PARAM_FORMAT_PATTERN)
