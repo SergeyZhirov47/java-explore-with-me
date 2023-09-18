@@ -25,6 +25,7 @@ public class CategoryAdminController {
     }
 
     @DeleteMapping("/{catId}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
     public void delete(@PathVariable long catId) {
         log.info(String.format("DELETE /admin/categories/{catId}, {catId} = %s", catId));
         categoryService.delete(catId);

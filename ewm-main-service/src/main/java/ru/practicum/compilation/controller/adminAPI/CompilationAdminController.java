@@ -26,6 +26,7 @@ public class CompilationAdminController {
     }
 
     @DeleteMapping("/{compId}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
     public void delete(@PathVariable long compId) {
         log.info(String.format("DELETE /admin/compilations/{compId}, {compId} = %s", compId));
         compilationService.delete(compId);
