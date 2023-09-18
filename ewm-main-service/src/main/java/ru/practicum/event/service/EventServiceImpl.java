@@ -78,6 +78,9 @@ public class EventServiceImpl implements EventService {
         if (nonNull(eventUpdateDto.getStateAction())) {
             final EventState newState = mapToEventState(eventUpdateDto.getStateAction());
             eventFromDB.setState(newState);
+
+            // ToDo
+            // Нужно что-то делать с заявка на это событие?
         }
 
         // Категорию меняю вручную.
@@ -88,8 +91,7 @@ public class EventServiceImpl implements EventService {
 
         eventFromDB = eventDao.save(eventFromDB);
 
-        final EventFullDto eventFullDto = EventMapper.toEventFullDto(eventFromDB);
-        return eventFullDto;
+        return EventMapper.toEventFullDto(eventFromDB);
     }
 
     @Override
@@ -114,6 +116,13 @@ public class EventServiceImpl implements EventService {
                 throw new IllegalStateException("Нельзя отменить опубликованное событие!");
             }
             eventFromDB.setState(newState);
+
+            if (newState.equals(EventState.PUBLISHED)) {
+                eventFromDB.setPublishedOn(LocalDateTime.now());
+            }
+
+            // ToDo
+            // Нужно что-то делать с заявка на это событие?
         }
 
         // Категорию меняю вручную.
@@ -124,8 +133,7 @@ public class EventServiceImpl implements EventService {
 
         eventFromDB = eventDao.save(eventFromDB);
 
-        final EventFullDto eventFullDto = EventMapper.toEventFullDto(eventFromDB);
-        return eventFullDto;
+        return EventMapper.toEventFullDto(eventFromDB);
     }
 
     @Override
