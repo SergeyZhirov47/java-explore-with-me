@@ -2,8 +2,6 @@ package ru.practicum.event.dto;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonSetter;
-import com.fasterxml.jackson.annotation.Nulls;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -13,7 +11,6 @@ import org.hibernate.validator.constraints.Length;
 import ru.practicum.event.model.Location;
 
 import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
 import java.time.LocalDateTime;
 
 import static ru.practicum.common.Utils.DATE_PARAM_FORMAT_PATTERN;
@@ -23,7 +20,7 @@ import static ru.practicum.common.Utils.DATE_PARAM_FORMAT_PATTERN;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class EventCreateDto {
+public class EventUpdateDto {
     @NotBlank
     @Length(min = 20, max = 2000)
     private String annotation;
@@ -33,18 +30,14 @@ public class EventCreateDto {
     @NotBlank
     @Length(min = 20, max = 7000)
     private String description;
-    @NotNull
     @JsonProperty("category")
     private Long categoryId;
-    @NotNull
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = DATE_PARAM_FORMAT_PATTERN)
     private LocalDateTime eventDate;
-    @NotNull
     private Location location;
     @JsonProperty("paid")
-    private boolean isPaid;
-    private int participantLimit;
-    @JsonSetter(nulls = Nulls.SKIP)
+    private Boolean isPaid;
+    private Integer participantLimit;
     @JsonProperty("requestModeration")
-    private boolean isModerationRequired = true;
+    private Boolean isModerationRequired;
 }

@@ -18,11 +18,13 @@ import ru.practicum.request.repository.RequestDao;
 import ru.practicum.user.model.User;
 import ru.practicum.user.repository.UserDao;
 
+import javax.validation.Validation;
+import javax.validation.Validator;
+import javax.validation.ValidatorFactory;
+import javax.validation.constraints.NotNull;
+import java.lang.reflect.Field;
 import java.time.LocalDateTime;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
@@ -69,8 +71,11 @@ public class EventServiceImpl implements EventService {
         EventMapper.updateIfDifferent(eventFromDB, eventUpdateDto);
 
         // Устанавливаем новое состояние.
-        final EventState newState = mapToEventState(eventUpdateDto.getStateAction());
-        eventFromDB.setState(newState);
+        final EventState oldState = eventFromDB.getState();
+        if (nonNull(eventUpdateDto.getStateAction())) {
+            final EventState newState = mapToEventState(eventUpdateDto.getStateAction());
+            eventFromDB.setState(newState);
+        }
 
         // Категорию меняю вручную.
         if (nonNull(eventUpdateDto.getCategoryId())) {
@@ -89,6 +94,8 @@ public class EventServiceImpl implements EventService {
 
     @Override
     public EventFullDto edit(long eventId, EventUpdateByAdminDto eventUpdateDto) {
+        testValidate(eventUpdateDto);
+
         if (nonNull(eventUpdateDto.getEventDate())) {
             validateEventDate(eventUpdateDto.getEventDate());
         }
@@ -101,8 +108,17 @@ public class EventServiceImpl implements EventService {
         EventMapper.updateIfDifferent(eventFromDB, eventUpdateDto);
 
         // Устанавливаем новое состояние.
-        final EventState newState = mapToEventState(eventUpdateDto.getStateAction());
-        eventFromDB.setState(newState);
+        final EventState oldState = eventFromDB.getState();
+        if (nonNull(eventUpdateDto.getStateAction())) {
+            final EventState newState = mapToEventState(eventUpdateDto.getStateAction());
+            if (oldState.equals(EventState.CANCELED) && newState.equals(EventState.PUBLISHED)) {
+                throw new IllegalStateException("Нельзя опубликовать отмененное событие!");
+            }
+            if (oldState.equals(EventState.PUBLISHED) && newState.equals(EventState.CANCELED)) {
+                throw new IllegalStateException("Нельзя отменить опубликованное событие!");
+            }
+            eventFromDB.setState(newState);
+        }
 
         // Категорию меняю вручную.
         if (nonNull(eventUpdateDto.getCategoryId())) {
@@ -259,6 +275,65 @@ public class EventServiceImpl implements EventService {
     private void validateEventStateForUpdate(EventState state) {
         if (!(state.equals(EventState.PENDING) || state.equals(EventState.CANCELED))) {
             throw new IllegalStateException("Изменять можно только отмененные события или события в состоянии ожидания модерации!");
+        }
+    }
+
+    private void validateTitle(String title) {
+        validateStringLength(title, 3, 120);
+    }
+
+    private void validateAnnotation(String annotation) {
+        validateStringLength(annotation, 20, 2000);
+    }
+
+    private void validateDescription(String description) {
+        validateStringLength(description, 20, 7000);
+    }
+
+    private void validateStringLength(String str, int min, int max) {
+        final int length = str.length();
+
+        if (length < min || length > max) {
+            throw new IllegalArgumentException();
+        }
+    }
+
+    public void testValidate(EventUpdateByAdminDto eventUpdateByAdminDto) {
+        ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
+        Validator validator = factory.getValidator();
+
+        // Получаем все поля объекта
+        Field[] fields = EventUpdateByAdminDto.class.getDeclaredFields();
+
+        // Создаем список полей для валидации
+        List<Field> fieldsToValidate = new ArrayList<>();
+
+        for (Field field : fields) {
+            field.setAccessible(true);
+
+            // Проверяем, поле не равно null или установлена ли аннотация @NotNull на поле
+            try {
+                if (field.get(eventUpdateByAdminDto) != null || field.isAnnotationPresent(NotNull.class)) {
+                    fieldsToValidate.add(field);
+                }
+            } catch (IllegalAccessException e) {
+                throw new RuntimeException(e);
+            }
+        }
+
+        // Валидируем поля
+        for (Field field : fieldsToValidate) {
+            Set<javax.validation.ConstraintViolation<EventUpdateByAdminDto>> violations = validator.validateProperty(eventUpdateByAdminDto, field.getName());
+
+            if (!violations.isEmpty()) {
+                throw new IllegalArgumentException();
+
+                // Обрабатываем ошибки валидации
+//                for (javax.validation.ConstraintViolation<EventUpdateByAdminDto> violation : violations) {
+//                    //System.out.println(violation.getMessage());
+//                    throw new IllegalArgumentException();
+//                }
+            }
         }
     }
 

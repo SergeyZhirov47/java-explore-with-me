@@ -65,14 +65,15 @@ public class EventMapper extends AbstractMapper {
                 .build();
     }
 
-    public void updateIfDifferent(Event event, final EventCreateDto eventWithChanges) {
+    public void updateIfDifferent(Event event, final EventUpdateDto eventWithChanges) {
+        // Cостояние меняем согласно логике
         event.setTitle(getChanged(event.getTitle(), eventWithChanges.getTitle()));
         event.setDescription(getChanged(event.getDescription(), eventWithChanges.getDescription()));
         event.setAnnotation(getChanged(event.getAnnotation(), eventWithChanges.getAnnotation()));
-        event.setPaid(getChanged(event.isPaid(), eventWithChanges.isPaid()));
+        event.setPaid(getChanged(event.isPaid(), eventWithChanges.getIsPaid()));
         event.setEventDate(getChanged(event.getEventDate(), eventWithChanges.getEventDate()));
         event.setParticipantLimit(getChanged(event.getParticipantLimit(), eventWithChanges.getParticipantLimit()));
-        event.setModerationRequired(getChanged(event.isModerationRequired(), eventWithChanges.isModerationRequired()));
+        event.setModerationRequired(getChanged(event.isModerationRequired(), eventWithChanges.getIsModerationRequired()));
         event.setLocation(getChanged(event.getLocation(), eventWithChanges.getLocation()));
     }
 }

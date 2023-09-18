@@ -12,6 +12,6 @@ import ru.practicum.event.model.UpdateEventUserAction;
 @Jacksonized
 @Data
 @AllArgsConstructor
-public class EventUpdateByUserDto extends EventCreateDto {
+public class EventUpdateByUserDto extends EventUpdateDto {
     private UpdateEventUserAction stateAction;
 }
