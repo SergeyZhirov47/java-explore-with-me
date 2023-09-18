@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import ru.practicum.common.OffsetPageableValidator;
+import ru.practicum.common.Utils;
 import ru.practicum.compilation.dto.CompilationCreateDto;
 import ru.practicum.compilation.dto.CompilationDto;
 import ru.practicum.compilation.dto.CompilationMapper;
@@ -44,6 +45,9 @@ public class CompilationServiceImpl implements CompilationService {
     public CompilationDto update(long id, CompilationUpdateDto compilationUpdateDto) {
         Compilation compilationFromDB = compilationDao.getCompilation(id);
 
+        // Валидация.
+        validateNotNullFields(compilationUpdateDto);
+
         // Обновление.
         CompilationMapper.updateIfDifferent(compilationFromDB, compilationUpdateDto);
 
@@ -75,5 +79,13 @@ public class CompilationServiceImpl implements CompilationService {
         final List<Compilation> filtered = compilationDao.getFilteredCompilations(pinned, pageable);
 
         return filtered.stream().map(CompilationMapper::toCompilationDto).collect(toUnmodifiableList());
+    }
+
+    private void validateNotNullFields(CompilationUpdateDto compilationUpdateDto) {
+        validateTitle(compilationUpdateDto.getTitle());
+    }
+
+    private void validateTitle(String title) {
+        Utils.validateLengthOfNullableString(title, 1, 50);
     }
 }
