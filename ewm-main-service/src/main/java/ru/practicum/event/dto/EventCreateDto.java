@@ -4,9 +4,7 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonSetter;
 import com.fasterxml.jackson.annotation.Nulls;
-import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
 import lombok.extern.jackson.Jacksonized;
 import org.hibernate.validator.constraints.Length;
@@ -21,8 +19,6 @@ import static ru.practicum.common.Utils.DATE_PARAM_FORMAT_PATTERN;
 @SuperBuilder
 @Jacksonized
 @Data
-@NoArgsConstructor
-@AllArgsConstructor
 public class EventCreateDto {
     @NotBlank
     @Length(min = 20, max = 2000)
@@ -43,10 +39,16 @@ public class EventCreateDto {
     private Location location;
     @JsonProperty("paid")
     @JsonSetter(nulls = Nulls.SKIP)
-    private Boolean isPaid = false;
+    private Boolean isPaid;
     @JsonSetter(nulls = Nulls.SKIP)
-    private Integer participantLimit = 0;
+    private Integer participantLimit;
     @JsonSetter(nulls = Nulls.SKIP)
     @JsonProperty("requestModeration")
-    private Boolean isModerationRequired = true;
+    private Boolean isModerationRequired;
+
+    public EventCreateDto() {
+        isPaid = false;
+        participantLimit = 0;
+        isModerationRequired = true;
+    }
 }

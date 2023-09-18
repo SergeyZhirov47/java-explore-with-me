@@ -49,6 +49,7 @@ public class EventServiceImpl implements EventService {
         final Category category = categoryDao.getCategory(eventCreateDto.getCategoryId());
 
         validateEventDate(eventCreateDto.getEventDate());
+        setDefaults(eventCreateDto);
 
         Event newEvent = EventMapper.toEvent(eventCreateDto);
         newEvent.setInitiator(initiator);
@@ -263,6 +264,21 @@ public class EventServiceImpl implements EventService {
         validateAnnotation(eventUpdateDto.getAnnotation());
         validateDescription(eventUpdateDto.getDescription());
         validateEventDate(eventUpdateDto.getEventDate());
+    }
+
+    private void setDefaults(EventCreateDto eventCreateDto) {
+        if (isNull(eventCreateDto.getIsPaid())) {
+            eventCreateDto.setIsPaid(false);
+        }
+
+        if (isNull(eventCreateDto.getIsModerationRequired())) {
+            eventCreateDto.setIsModerationRequired(true);
+        }
+
+        if (isNull(eventCreateDto.getParticipantLimit())) {
+            eventCreateDto.setParticipantLimit(0);
+        }
+
     }
 
     private void testValidate(EventUpdateByAdminDto eventUpdateByAdminDto) {
