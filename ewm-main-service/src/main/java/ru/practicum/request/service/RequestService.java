@@ -13,7 +13,7 @@ public interface RequestService {
 
     List<RequestDto> getUserRequests(long userId);
 
-    List<RequestDto> getUserRequestsInEvent(long userId, long eventId);
+    List<RequestDto> getRequestsInUserEvent(long userId, long eventId);
 
     EventRequestStatusUpdateResultDto changeStatus(long userId, long eventId, EventRequestStatusUpdateDataDto updateDataDto);
 }

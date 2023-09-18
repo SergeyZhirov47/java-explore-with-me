@@ -19,7 +19,7 @@ public interface RequestDao {
 
     List<Request> getUserRequests(long userId);
 
-    List<Request> getUserRequestsInEvent(long userId, long eventId);
+    List<Request> getRequestsInUserEvent(long userId, long eventId);
 
     void checkRequestExists(long id);
 

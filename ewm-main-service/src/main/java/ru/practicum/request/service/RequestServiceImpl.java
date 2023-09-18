@@ -184,13 +184,14 @@ public class RequestServiceImpl implements RequestService {
         return userRequests.stream().map(RequestMapper::toRequestDto).collect(toUnmodifiableList());
     }
 
+    // Получение информации о заявках на участие событиях текущего пользователя
     @Override
     @Transactional(readOnly = true)
-    public List<RequestDto> getUserRequestsInEvent(long userId, long eventId) {
+    public List<RequestDto> getRequestsInUserEvent(long userId, long eventId) {
         userDao.checkUserExists(userId);
         eventDao.checkEventExists(eventId);
 
-        final List<Request> userRequests = requestDao.getUserRequestsInEvent(userId, eventId);
+        final List<Request> userRequests = requestDao.getRequestsInUserEvent(userId, eventId);
         return userRequests.stream().map(RequestMapper::toRequestDto).collect(toUnmodifiableList());
     }
 

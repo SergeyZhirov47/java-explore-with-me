@@ -13,7 +13,7 @@ import java.util.List;
 public interface RequestRepository extends JpaRepository<Request, Long>, QuerydslPredicateExecutor<Request> {
     List<Request> findAllByRequesterId(long requesterId);
 
-    List<Request> findAllByRequesterIdAndEventId(long requesterId, long eventId);
+    List<Request> findAllByEventId(long eventId);
 
     List<Request> findAllByIdIn(List<Long> ids);
 

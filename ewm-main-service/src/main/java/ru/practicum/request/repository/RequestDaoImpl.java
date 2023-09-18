@@ -1,5 +1,6 @@
 package ru.practicum.request.repository;
 
+import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.Tuple;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.core.types.dsl.Expressions;
@@ -69,8 +70,16 @@ public class RequestDaoImpl implements RequestDao {
     }
 
     @Override
-    public List<Request> getUserRequestsInEvent(long userId, long eventId) {
-        return requestRepository.findAllByRequesterIdAndEventId(userId, eventId);
+    public List<Request> getRequestsInUserEvent(long userId, long eventId) {
+        final QRequest qRequest = QRequest.request;
+
+        BooleanBuilder booleanBuilder = new BooleanBuilder();
+        booleanBuilder.and(qRequest.event().id.eq(eventId));
+        booleanBuilder.and(qRequest.event().initiator().id.eq(userId));
+
+        final List<Request> requestsInUserEvent = queryFactory.selectFrom(qRequest).where(booleanBuilder).fetch();
+        return requestsInUserEvent;
+        //return requestRepository.findAllByEventId(eventId);
     }
 
     @Override
@@ -100,17 +109,6 @@ public class RequestDaoImpl implements RequestDao {
         final SimpleExpression<Long> confirmedRequestCount = qRequest.id.count();
         final NumberPath<Long> aliasConfirmedCount = Expressions.numberPath(Long.class, "confirmedCount");
 
-//        final List<Tuple> queryResult = queryFactory.selectFrom(qRequest)
-//                .where(whereExpression)
-//                .groupBy(qRequest.event().id)
-//                .select(qRequest.event().id, confirmedRequestCount.as(aliasConfirmedCount))
-//                .fetch();
-//
-//        final Map<Long, Long> resultMap = new HashMap<>();
-//        for (Tuple row : queryResult) {
-//            resultMap.put(row.get(qRequest.event().id), row.get(aliasConfirmedCount));
-//        }
-
         var result = queryFactory.select(qRequest.event().id, confirmedRequestCount.as(aliasConfirmedCount))
                 .from(qRequest)
                 .where(whereExpression)
@@ -121,10 +119,6 @@ public class RequestDaoImpl implements RequestDao {
         for (Tuple row : result) {
             resultMap.put(row.get(qRequest.event().id), row.get(aliasConfirmedCount));
         }
-
-//        final List<Request> confirmedRequests = StreamSupport.stream(requestRepository.findAll(whereExpression).spliterator(),false)
-//
-//                .collect(Collectors.toList());
 
         return resultMap;
     }
