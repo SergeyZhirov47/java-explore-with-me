@@ -2,8 +2,6 @@ package ru.practicum.event.dto;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonSetter;
-import com.fasterxml.jackson.annotation.Nulls;
 import lombok.Data;
 import lombok.experimental.SuperBuilder;
 import lombok.extern.jackson.Jacksonized;
@@ -38,17 +36,8 @@ public class EventCreateDto {
     @NotNull
     private Location location;
     @JsonProperty("paid")
-    @JsonSetter(nulls = Nulls.SKIP)
     private Boolean isPaid;
-    @JsonSetter(nulls = Nulls.SKIP)
     private Integer participantLimit;
-    @JsonSetter(nulls = Nulls.SKIP)
     @JsonProperty("requestModeration")
     private Boolean isModerationRequired;
-
-    public EventCreateDto() {
-        isPaid = false;
-        participantLimit = 0;
-        isModerationRequired = true;
-    }
 }
