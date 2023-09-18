@@ -171,6 +171,9 @@ public class EventServiceImpl implements EventService {
             return Collections.emptyList();
         }
 
+        // Получение и установка данных из статистики и заявок.
+        addViewsAndConfirmedRequests(searchedEvents);
+
         return searchedEvents.stream().map(EventMapper::toEventFullDto).collect(toUnmodifiableList());
     }
 
