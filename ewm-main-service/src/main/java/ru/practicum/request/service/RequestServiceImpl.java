@@ -108,10 +108,10 @@ public class RequestServiceImpl implements RequestService {
         // Что будет делать? В любом случае исключение (если requestList.size() != updateDataDto.getRequestIds().size())
 
         // статус можно изменить только у заявок, находящихся в состоянии ожидания (Ожидается код ошибки 409)
-        final boolean isAllRequestsHasPendingStatus = requestList.stream().anyMatch(r -> !r.getStatus().equals(RequestStatus.PENDING));
-        if (!isAllRequestsHasPendingStatus) {
-            throw new IllegalStateException("Статус можно изменить только у заявок, находящихся в состоянии ожидания!");
-        }
+//        final boolean isAllRequestsHasPendingStatus = requestList.stream().anyMatch(r -> !r.getStatus().equals(RequestStatus.PENDING));
+//        if (!isAllRequestsHasPendingStatus) {
+//            throw new IllegalStateException("Статус можно изменить только у заявок, находящихся в состоянии ожидания!");
+//        }
 
         // если для события лимит заявок равен 0 или отключена пре-модерация заявок, то подтверждение заявок не требуется
         if (event.getParticipantLimit() == 0) {
