@@ -45,7 +45,7 @@ public class RequestServiceImpl implements RequestService {
         }
 
         if (event.getInitiator().getId() == userId) {
-            throw new IllegalArgumentException("Инициатор события не может добавить запрос на участие в своём событии!");
+            throw new IllegalStateException("Инициатор события не может добавить запрос на участие в своём событии!");
         }
 
         if (event.getParticipantLimit() != 0) {
@@ -57,9 +57,18 @@ public class RequestServiceImpl implements RequestService {
             }
         }
 
-        // ToDo
-        // "или отключена пре-модерация заявок" - это условие добавлять?
-        final RequestStatus newRequestStatus = event.isModerationRequired() ? RequestStatus.PENDING : RequestStatus.CONFIRMED;
+        // event.getParticipantLimit() == 0
+        // final RequestStatus newRequestStatus = event.isModerationRequired() ? RequestStatus.PENDING : RequestStatus.CONFIRMED;
+        final RequestStatus newRequestStatus = event.getParticipantLimit() == 0 || !event.isModerationRequired() ? RequestStatus.CONFIRMED : RequestStatus.PENDING;
+
+//        if (event.isModerationRequired()) {
+//            if (event.getParticipantLimit() == 0) {
+//                newRequestStatus = RequestStatus.CONFIRMED;
+//            }
+//            newRequestStatus = RequestStatus.PENDING;
+//        } else {
+//            newRequestStatus = RequestStatus.CONFIRMED;
+//        }
 
         Request newRequest = Request.builder()
                 .requester(requester)
