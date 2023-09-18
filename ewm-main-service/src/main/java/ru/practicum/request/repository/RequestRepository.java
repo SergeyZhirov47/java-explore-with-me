@@ -21,6 +21,8 @@ public interface RequestRepository extends JpaRepository<Request, Long>, Queryds
 
     Integer countAllByEventIdAndStatusIn(long eventId, List<RequestStatus> statuses);
 
+    Integer countAllByEventId(long eventId);
+
     @Query("SELECT case when count(r)> 0 then true else false end FROM Request as r WHERE r.requester.id = :userId AND r.event.id = :eventId")
     boolean hasRequest(@Param("eventId") long eventId, @Param("userId") long userId);
 }

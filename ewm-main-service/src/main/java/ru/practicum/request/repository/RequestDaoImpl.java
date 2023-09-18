@@ -91,7 +91,8 @@ public class RequestDaoImpl implements RequestDao {
 
     @Override
     public int getParticipantCountInEvent(long eventId) {
-        return requestRepository.countAllByEventIdAndStatusIn(eventId, List.of(RequestStatus.PENDING, RequestStatus.CONFIRMED));
+        return requestRepository.countAllByEventId(eventId);
+        // return requestRepository.countAllByEventIdAndStatusIn(eventId, List.of(RequestStatus.PENDING, RequestStatus.CONFIRMED));
     }
 
     @Override
