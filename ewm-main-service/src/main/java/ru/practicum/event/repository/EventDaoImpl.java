@@ -1,6 +1,6 @@
 package ru.practicum.event.repository;
 
-import com.querydsl.core.types.dsl.BooleanExpression;
+import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.types.dsl.PathBuilderFactory;
 import com.querydsl.jpa.JPQLTemplates;
 import com.querydsl.jpa.impl.JPAQuery;
@@ -80,22 +80,24 @@ public class EventDaoImpl implements EventDao {
                                     Pageable pageable) {
         final QEvent qEvent = QEvent.event;
 
-        BooleanExpression whereExpression = qEvent.initiator().id.in(userIds);
-
+        final BooleanBuilder booleanBuilder = new BooleanBuilder();
+        if (nonNull(userIds)) {
+            booleanBuilder.and(qEvent.initiator().id.in(userIds));
+        }
         if (nonNull(states)) {
-            whereExpression = whereExpression.and(qEvent.state.in(states));
+            booleanBuilder.and(qEvent.state.in(states));
         }
         if (nonNull(categoryIds)) {
-            whereExpression = whereExpression.and(qEvent.category().id.in(categoryIds));
+            booleanBuilder.and(qEvent.category().id.in(categoryIds));
         }
         if (nonNull(start)) {
-            whereExpression = whereExpression.and(qEvent.eventDate.after(start));
+            booleanBuilder.and(qEvent.eventDate.after(start));
         }
         if (nonNull(end)) {
-            whereExpression = whereExpression.and(qEvent.eventDate.before(end));
+            booleanBuilder.and(qEvent.eventDate.before(end));
         }
 
-        final JPAQuery<Event> searchQuery = queryFactory.selectFrom(qEvent).where(whereExpression);
+        final JPAQuery<Event> searchQuery = queryFactory.selectFrom(qEvent).where(booleanBuilder);
 
         final List<Event> result;
         if (nonNull(pageable) && pageable.isPaged()) {
@@ -118,27 +120,25 @@ public class EventDaoImpl implements EventDao {
                                           Pageable pageable) {
         final QEvent qEvent = QEvent.event;
 
-        BooleanExpression whereExpression = qEvent.state.eq(EventState.PUBLISHED);
-
+        final BooleanBuilder booleanBuilder = new BooleanBuilder(qEvent.state.eq(EventState.PUBLISHED));
         if (nonNull(text)) {
-            whereExpression = whereExpression.and(qEvent.annotation.containsIgnoreCase(text)
+            booleanBuilder.and(qEvent.annotation.containsIgnoreCase(text)
                     .or(qEvent.description.containsIgnoreCase(text)));
         }
         if (nonNull(categoryIds)) {
-            whereExpression = whereExpression.and(qEvent.category().id.in(categoryIds));
+            booleanBuilder.and(qEvent.category().id.in(categoryIds));
         }
         if (nonNull(paid)) {
-            whereExpression = whereExpression.and(qEvent.isPaid.eq(paid));
+            booleanBuilder.and(qEvent.isPaid.eq(paid));
         }
         if (nonNull(start)) {
-            whereExpression = whereExpression.and(qEvent.eventDate.after(start));
+            booleanBuilder.and(qEvent.eventDate.after(start));
         }
         if (nonNull(end)) {
-            whereExpression = whereExpression.and(qEvent.eventDate.before(end));
+            booleanBuilder.and(qEvent.eventDate.before(end));
         }
 
-        JPAQuery<Event> searchQuery = queryFactory.selectFrom(qEvent)
-                .where(whereExpression);
+        JPAQuery<Event> searchQuery = queryFactory.selectFrom(qEvent).where(booleanBuilder);
 
         if (nonNull(sort) && sort.equals(EventSort.EVENT_DATE)) {
             searchQuery = searchQuery.orderBy(qEvent.eventDate.asc());
