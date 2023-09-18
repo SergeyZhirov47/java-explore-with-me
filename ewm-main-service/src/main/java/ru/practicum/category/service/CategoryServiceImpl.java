@@ -3,6 +3,7 @@ package ru.practicum.category.service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.category.dto.CategoryChangesDto;
 import ru.practicum.category.dto.CategoryDto;
 import ru.practicum.category.dto.CategoryMapper;
@@ -35,6 +36,7 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     @Override
+    @Transactional
     public void delete(long id) {
         categoryDao.checkCategoryExists(id);
         categoryDao.delete(id);
@@ -49,12 +51,10 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     @Override
+    @Transactional
     public CategoryDto update(long id, CategoryChangesDto categoryChangesDto) {
         Category category = categoryDao.getCategory(id);
         category.setName(categoryChangesDto.getName());
-
-        // ToDo
-        // Проверяем есть ли категория с таким названием? или перекладываем на БД
 
         category = categoryDao.save(category);
         return CategoryMapper.toCategoryDto(category);

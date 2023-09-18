@@ -3,6 +3,7 @@ package ru.practicum.compilation.service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.common.OffsetPageableValidator;
 import ru.practicum.common.Utils;
 import ru.practicum.compilation.dto.CompilationCreateDto;
@@ -28,6 +29,7 @@ public class CompilationServiceImpl implements CompilationService {
     private final EventDao eventDao;
 
     @Override
+    @Transactional
     public CompilationDto add(CompilationCreateDto compilationCreateDto) {
         Compilation compilation = CompilationMapper.toCompilation(compilationCreateDto);
 
@@ -42,6 +44,7 @@ public class CompilationServiceImpl implements CompilationService {
     }
 
     @Override
+    @Transactional
     public CompilationDto update(long id, CompilationUpdateDto compilationUpdateDto) {
         Compilation compilationFromDB = compilationDao.getCompilation(id);
 
@@ -62,6 +65,7 @@ public class CompilationServiceImpl implements CompilationService {
     }
 
     @Override
+    @Transactional
     public void delete(long id) {
         compilationDao.checkCompilationExists(id);
         compilationDao.delete(id);
@@ -74,6 +78,7 @@ public class CompilationServiceImpl implements CompilationService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<CompilationDto> getFilteredCompilations(boolean pinned, Integer from, Integer size) {
         final Pageable pageable = OffsetPageableValidator.validateAndGet(from, size);
         final List<Compilation> filtered = compilationDao.getFilteredCompilations(pinned, pageable);

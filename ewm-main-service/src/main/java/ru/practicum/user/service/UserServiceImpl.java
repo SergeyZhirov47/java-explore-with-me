@@ -3,6 +3,7 @@ package ru.practicum.user.service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.common.OffsetPageableValidator;
 import ru.practicum.user.dto.UserCreateDto;
 import ru.practicum.user.dto.UserDto;
@@ -36,13 +37,12 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserDto create(UserCreateDto userCreateDto) {
-        // ToDo
-        // проверять ли уникальность почты?
         final User createdUser = userDao.save(UserMapper.toUser(userCreateDto));
         return UserMapper.toUserDto(createdUser);
     }
 
     @Override
+    @Transactional
     public void delete(long id) {
         userDao.checkUserExists(id);
         userDao.delete(id);

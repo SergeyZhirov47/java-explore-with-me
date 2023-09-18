@@ -32,6 +32,7 @@ public class RequestServiceImpl implements RequestService {
     private final EventDao eventDao;
 
     @Override
+    @Transactional
     public RequestDto add(long userId, long eventId) {
         final User requester = userDao.getUser(userId);
         final Event event = eventDao.getEvent(eventId);
@@ -82,6 +83,7 @@ public class RequestServiceImpl implements RequestService {
     }
 
     @Override
+    @Transactional
     public EventRequestStatusUpdateResultDto changeStatus(long userId, long eventId, EventRequestStatusUpdateDataDto updateDataDto) {
         userDao.checkUserExists(userId);
         final Event event = eventDao.getEvent(eventId);
@@ -96,11 +98,6 @@ public class RequestServiceImpl implements RequestService {
 
             return resultDto;
         }
-
-        // ToDo
-        // Для всех случаев.
-        // 1. Обновляем и тут же вычитываем обновленные запросы? (чтобы статус был корректный в ответах)
-        // 2. Читаем все одобренные и отклоненные для данного события? или только те что в запросе пришли?
 
         // Получить заявки (получаем в порядке добавления).
         final List<Request> requestList = requestDao.getRequests(updateDataDto.getRequestIds(), Sort.by("created"));
@@ -179,6 +176,7 @@ public class RequestServiceImpl implements RequestService {
 
     // Получение информации о заявках текущего пользователя на участие в чужих событиях
     @Override
+    @Transactional(readOnly = true)
     public List<RequestDto> getUserRequests(long userId) {
         userDao.checkUserExists(userId);
 
@@ -187,6 +185,7 @@ public class RequestServiceImpl implements RequestService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<RequestDto> getUserRequestsInEvent(long userId, long eventId) {
         userDao.checkUserExists(userId);
         eventDao.checkEventExists(eventId);

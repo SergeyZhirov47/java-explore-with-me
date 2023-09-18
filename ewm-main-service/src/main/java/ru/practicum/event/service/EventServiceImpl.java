@@ -44,6 +44,7 @@ public class EventServiceImpl implements EventService {
     private final StatsClientWrapper statsClientWrapper;
 
     @Override
+    @Transactional
     public EventFullDto add(long userId, EventCreateDto eventCreateDto) {
         final User initiator = userDao.getUser(userId);
         final Category category = categoryDao.getCategory(eventCreateDto.getCategoryId());
@@ -63,6 +64,7 @@ public class EventServiceImpl implements EventService {
     }
 
     @Override
+    @Transactional
     public EventFullDto edit(long userId, long eventId, EventUpdateByUserDto eventUpdateDto) {
         validateNotNullFields(eventUpdateDto);
 
@@ -91,6 +93,7 @@ public class EventServiceImpl implements EventService {
     }
 
     @Override
+    @Transactional
     public EventFullDto edit(long eventId, EventUpdateByAdminDto eventUpdateDto) {
         validateNotNullFields(eventUpdateDto);
 
@@ -132,6 +135,7 @@ public class EventServiceImpl implements EventService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public EventFullDto getEvent(long id) {
         final Event event = eventDao.getEvent(id);
 
@@ -142,6 +146,7 @@ public class EventServiceImpl implements EventService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public EventFullDto getEventOnlyIfPublished(long id) {
         final Event event = eventDao.getEvent(id);
         if (!event.getState().equals(EventState.PUBLISHED)) {
@@ -179,6 +184,7 @@ public class EventServiceImpl implements EventService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<EventShortDto> getPublishedEvents(String text,
                                                   List<Long> categoryIds,
                                                   Boolean paid,
