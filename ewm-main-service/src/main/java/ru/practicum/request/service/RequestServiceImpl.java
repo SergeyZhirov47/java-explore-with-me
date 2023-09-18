@@ -130,9 +130,9 @@ public class RequestServiceImpl implements RequestService {
             int participantCount = requestDao.getParticipantCountInEvent(event.getId());
 
             // нельзя подтвердить заявку, если уже достигнут лимит по заявкам на данное событие (Ожидается код ошибки 409)
-            if (participantCount == event.getParticipantLimit()) {
-                throw new IllegalStateException("Заявки нельзя утвердить. Достигнут лимит по заявкам на данное событие!");
-            }
+//            if (participantCount == event.getParticipantLimit()) {
+//                throw new IllegalStateException("Заявки нельзя утвердить. Достигнут лимит по заявкам на данное событие!");
+//            }
 
             // если при подтверждении данной заявки, лимит заявок для события исчерпан, то все неподтверждённые заявки необходимо отклонить
             // ToDo
