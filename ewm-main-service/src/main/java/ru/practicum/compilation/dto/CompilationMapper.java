@@ -6,6 +6,7 @@ import ru.practicum.compilation.model.Compilation;
 import ru.practicum.event.dto.EventMapper;
 import ru.practicum.event.dto.EventShortDto;
 
+import java.util.Collections;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -21,7 +22,7 @@ public class CompilationMapper extends AbstractMapper {
     }
 
     public CompilationDto toCompilationDto(Compilation compilation) {
-        Set<EventShortDto> eventShortDtoSet = null;
+        Set<EventShortDto> eventShortDtoSet = Collections.emptySet();
         if (nonNull(compilation.getEvents())) {
             eventShortDtoSet = compilation.getEvents().stream()
                     .map(EventMapper::toEventShortDto)
