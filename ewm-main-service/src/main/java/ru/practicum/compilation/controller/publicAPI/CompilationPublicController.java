@@ -16,7 +16,7 @@ public class CompilationPublicController {
     private final CompilationService compilationService;
 
     @GetMapping
-    public List<CompilationDto> getFiltered(@RequestParam boolean pinned,
+    public List<CompilationDto> getFiltered(@RequestParam(defaultValue = "false") Boolean pinned,
                                             @RequestParam(defaultValue = "0") Integer from,
                                             @RequestParam(defaultValue = "10") Integer size) {
         log.info(String.format("GET /compilations?pinned={pinned}&from={from}&size={size}, {pinned} = %s, {from} = %s, {size} = %s", pinned, from, size));
