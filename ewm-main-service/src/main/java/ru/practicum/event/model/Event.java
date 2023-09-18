@@ -28,11 +28,11 @@ public class Event {
     @JoinColumn(name = "initiator_id")
     private User initiator;
     private LocalDateTime eventDate;
-    private int participantLimit;
-    private boolean isPaid;
+    private Integer participantLimit;
+    private Boolean isPaid;
     @Enumerated(EnumType.STRING)
     private EventState state;
-    private boolean isModerationRequired;
+    private Boolean isModerationRequired;
     @Column(name = "created")
     private LocalDateTime createdOn;
     @Column(name = "published")

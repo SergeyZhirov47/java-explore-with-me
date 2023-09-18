@@ -32,13 +32,13 @@ public class EventMapper extends AbstractMapper {
                 .title(event.getTitle())
                 .description(event.getDescription())
                 .annotation(event.getAnnotation())
-                .isPaid(event.isPaid())
+                .isPaid(event.getIsPaid())
                 .eventDate(event.getEventDate())
                 .initiator(initiator)
                 .category(category)
                 .createdOn(event.getCreatedOn())
                 .participantLimit(event.getParticipantLimit())
-                .isModerationRequired(event.isModerationRequired())
+                .isModerationRequired(event.getIsModerationRequired())
                 .location(event.getLocation())
                 .state(event.getState())
                 .publishedOn(event.getPublishedOn())
@@ -56,7 +56,7 @@ public class EventMapper extends AbstractMapper {
                 .title(event.getTitle())
                 .description(event.getDescription())
                 .annotation(event.getAnnotation())
-                .isPaid(event.isPaid())
+                .isPaid(event.getIsPaid())
                 .eventDate(event.getEventDate())
                 .initiator(initiator)
                 .category(category)
@@ -70,10 +70,10 @@ public class EventMapper extends AbstractMapper {
         event.setTitle(getChanged(event.getTitle(), eventWithChanges.getTitle()));
         event.setDescription(getChanged(event.getDescription(), eventWithChanges.getDescription()));
         event.setAnnotation(getChanged(event.getAnnotation(), eventWithChanges.getAnnotation()));
-        event.setPaid(getChanged(event.isPaid(), eventWithChanges.getIsPaid()));
+        event.setIsPaid(getChanged(event.getIsPaid(), eventWithChanges.getIsPaid()));
         event.setEventDate(getChanged(event.getEventDate(), eventWithChanges.getEventDate()));
         event.setParticipantLimit(getChanged(event.getParticipantLimit(), eventWithChanges.getParticipantLimit()));
-        event.setModerationRequired(getChanged(event.isModerationRequired(), eventWithChanges.getIsModerationRequired()));
+        event.setIsModerationRequired(getChanged(event.getIsModerationRequired(), eventWithChanges.getIsModerationRequired()));
         event.setLocation(getChanged(event.getLocation(), eventWithChanges.getLocation()));
     }
 }
