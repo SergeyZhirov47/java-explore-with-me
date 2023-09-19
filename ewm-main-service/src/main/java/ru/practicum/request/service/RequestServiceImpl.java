@@ -52,8 +52,8 @@ public class RequestServiceImpl implements RequestService {
 
         if (event.getParticipantLimit() != 0) {
             // сколько пользователей захотело участвовать (у кого заявка в рассмотрении или одобрена)
-            // int participantCount = requestDao.getParticipantCountInEvent(event.getId());
-            int participantCount = requestDao.getConfirmedRequestsCount(event.getId());
+            int participantCount = requestDao.getParticipantCountInEvent(event.getId());
+            // int participantCount = requestDao.getConfirmedRequestsCount(event.getId());
 
             if (participantCount == event.getParticipantLimit()) {
                 throw new IllegalStateException("Уже достигнут лимит на кол-во участников события!");
