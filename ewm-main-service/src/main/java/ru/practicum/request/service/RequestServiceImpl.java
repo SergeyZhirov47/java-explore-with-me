@@ -38,10 +38,6 @@ public class RequestServiceImpl implements RequestService {
         final User requester = userDao.getUser(userId);
         final Event event = eventDao.getEvent(eventId);
 
-        // ToDo
-        // нельзя добавить повторный запрос (Ожидается код ошибки 409)
-        // Самому проверять или переложить на БД?
-
         if (!event.getState().equals(EventState.PUBLISHED)) {
             throw new IllegalStateException("Нельзя участвовать в неопубликованном событии!");
         }
@@ -51,7 +47,6 @@ public class RequestServiceImpl implements RequestService {
         }
 
         if (event.getParticipantLimit() != 0) {
-            // сколько пользователей захотело участвовать (у кого заявка в рассмотрении или одобрена)
             int participantCount = requestDao.getConfirmedRequestsCount(event.getId());
 
             if (participantCount == event.getParticipantLimit()) {

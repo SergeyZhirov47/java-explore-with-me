@@ -20,14 +20,11 @@ import ru.practicum.request.repository.RequestDao;
 import ru.practicum.user.model.User;
 import ru.practicum.user.repository.UserDao;
 
-import javax.validation.ConstraintViolation;
-import javax.validation.Validation;
-import javax.validation.Validator;
-import javax.validation.ValidatorFactory;
-import javax.validation.constraints.NotNull;
-import java.lang.reflect.Field;
 import java.time.LocalDateTime;
-import java.util.*;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Map;
 
 import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
@@ -292,45 +289,6 @@ public class EventServiceImpl implements EventService {
         if (isNull(eventCreateDto.getParticipantLimit())) {
             eventCreateDto.setParticipantLimit(0);
         }
-
-    }
-
-    private void testValidate(EventUpdateByAdminDto eventUpdateByAdminDto) {
-        final ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
-        final Validator validator = factory.getValidator();
-
-        // Получаем все поля объекта
-        final Field[] fields = EventUpdateByAdminDto.class.getDeclaredFields();
-
-        // Создаем список полей для валидации
-        final List<Field> fieldsToValidate = new ArrayList<>();
-
-        for (Field field : fields) {
-            field.setAccessible(true);
-
-            // Проверяем, поле не равно null или установлена ли аннотация @NotNull на поле
-            try {
-                if (field.get(eventUpdateByAdminDto) != null || field.isAnnotationPresent(NotNull.class)) {
-                    fieldsToValidate.add(field);
-                    log.info(field + " будет проверено");
-                }
-            } catch (IllegalAccessException e) {
-                log.warn("внутри testValidate что-то случилось");
-                throw new RuntimeException(e);
-            }
-        }
-
-        // Валидируем поля
-        for (Field field : fieldsToValidate) {
-            final Set<ConstraintViolation<EventUpdateByAdminDto>> violations = validator.validateProperty(eventUpdateByAdminDto, field.getName());
-
-            if (!violations.isEmpty()) {
-                log.info(field.getName() + " поле не прошло валидацию");
-                throw new IllegalArgumentException(field.getName() + " поле не прошло валидацию");
-            }
-        }
-
-        log.info(eventUpdateByAdminDto + " успешно прошел валидацию");
     }
 
     private void addViewsAndConfirmedRequests(Event event) {
