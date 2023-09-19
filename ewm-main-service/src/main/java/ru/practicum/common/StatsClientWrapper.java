@@ -12,6 +12,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 import static java.util.Objects.isNull;
+import static ru.practicum.common.Utils.APP_NAME;
 
 @Service
 @RequiredArgsConstructor
@@ -19,9 +20,7 @@ public class StatsClientWrapper {
     private final StatsClient statsClient;
 
     public void saveHit(HttpServletRequest request) throws JsonProcessingException {
-        // ToDo
-        // Вынести название приложения в константу
-        statsClient.callEndpointHit("app", request.getRequestURI(), request.getRemoteAddr());
+        statsClient.callEndpointHit(APP_NAME, request.getRequestURI(), request.getRemoteAddr());
     }
 
     public List<EndpointStatsDto> getStats(LocalDateTime start, LocalDateTime end, List<String> uris, Boolean unique) {
