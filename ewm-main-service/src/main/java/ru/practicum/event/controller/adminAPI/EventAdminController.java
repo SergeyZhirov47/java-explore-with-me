@@ -17,7 +17,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 import static java.util.Objects.nonNull;
-import static ru.practicum.common.Utils.DATE_PARAM_FORMAT_PATTERN;
+import static ru.practicum.common.Utils.*;
 
 @RestController
 @RequiredArgsConstructor
@@ -32,8 +32,8 @@ public class EventAdminController {
                                      @RequestParam(required = false) List<Long> categories,
                                      @RequestParam(required = false) @DateTimeFormat(pattern = DATE_PARAM_FORMAT_PATTERN) LocalDateTime rangeStart,
                                      @RequestParam(required = false) @DateTimeFormat(pattern = DATE_PARAM_FORMAT_PATTERN) LocalDateTime rangeEnd,
-                                     @RequestParam(defaultValue = "0") Integer from,
-                                     @RequestParam(defaultValue = "10") Integer size) {
+                                     @RequestParam(defaultValue = DEFAULT_FROM_VALUE) Integer from,
+                                     @RequestParam(defaultValue = DEFAULT_SIZE_VALUE) Integer size) {
         Map<String, Object> params = new HashMap<>();
         params.put("users", users);
         params.put("states", states);

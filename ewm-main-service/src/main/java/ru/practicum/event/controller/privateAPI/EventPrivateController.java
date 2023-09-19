@@ -16,6 +16,9 @@ import ru.practicum.request.service.RequestService;
 import javax.validation.Valid;
 import java.util.List;
 
+import static ru.practicum.common.Utils.DEFAULT_FROM_VALUE;
+import static ru.practicum.common.Utils.DEFAULT_SIZE_VALUE;
+
 @RestController
 @RequiredArgsConstructor
 @RequestMapping(path = "/users/{userId}/events")
@@ -26,8 +29,8 @@ public class EventPrivateController {
 
     @GetMapping
     public List<EventFullDto> getUserEvents(@PathVariable long userId,
-                                            @RequestParam(defaultValue = "0") Integer from,
-                                            @RequestParam(defaultValue = "10") Integer size) {
+                                            @RequestParam(defaultValue = DEFAULT_FROM_VALUE) Integer from,
+                                            @RequestParam(defaultValue = DEFAULT_SIZE_VALUE) Integer size) {
         log.info(String.format("GET /users/{userId}/events, {userId} = %s, from = %s, size = %s", userId, from, size));
         return eventService.getEventsByUser(userId, from, size);
     }

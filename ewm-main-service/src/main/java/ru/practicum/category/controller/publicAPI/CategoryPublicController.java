@@ -8,6 +8,9 @@ import ru.practicum.category.service.CategoryService;
 
 import java.util.List;
 
+import static ru.practicum.common.Utils.DEFAULT_FROM_VALUE;
+import static ru.practicum.common.Utils.DEFAULT_SIZE_VALUE;
+
 @RestController
 @RequiredArgsConstructor
 @RequestMapping(path = "/categories")
@@ -16,8 +19,8 @@ public class CategoryPublicController {
     private final CategoryService categoryService;
 
     @GetMapping
-    public List<CategoryDto> getCategories(@RequestParam(defaultValue = "0") Integer from,
-                                           @RequestParam(defaultValue = "10") Integer size) {
+    public List<CategoryDto> getCategories(@RequestParam(defaultValue = DEFAULT_FROM_VALUE) Integer from,
+                                           @RequestParam(defaultValue = DEFAULT_SIZE_VALUE) Integer size) {
         log.info(String.format("GET /categories, from = %s, size = %s", from, size));
         return categoryService.getCategories(from, size);
     }
