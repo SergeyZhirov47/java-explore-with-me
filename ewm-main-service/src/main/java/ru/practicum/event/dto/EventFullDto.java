@@ -2,6 +2,7 @@ package ru.practicum.event.dto;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonUnwrapped;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -20,14 +21,14 @@ import static ru.practicum.common.Utils.DATE_PARAM_FORMAT_PATTERN;
 @AllArgsConstructor
 public class EventFullDto {
     private long id;
-    private String annotation;
-    private String title;
-    private String description;
+    @JsonUnwrapped
+    private EventTextInfoDto eventTextInfoDto;
     private CategoryDto category;
     private UserDto initiator;
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = DATE_PARAM_FORMAT_PATTERN)
     private LocalDateTime eventDate;
     private LocationDto location;
+    private EventState state;
     @JsonProperty("paid")
     private Boolean isPaid;
     private Integer participantLimit;
@@ -37,7 +38,6 @@ public class EventFullDto {
     private LocalDateTime createdOn;
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = DATE_PARAM_FORMAT_PATTERN)
     private LocalDateTime publishedOn;
-    private EventState state;
-    private long confirmedRequests;
-    private long views;
+    @JsonUnwrapped
+    private EventExternalDataDto eventExternalDataDto;
 }

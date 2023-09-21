@@ -31,11 +31,19 @@ public class EventMapper extends AbstractMapper {
         final CategoryDto category = CategoryMapper.toCategoryDto(event.getCategory());
         final LocationDto location = LocationMapper.toLocationDto(event.getLocation());
 
-        return EventFullDto.builder()
-                .id(event.getId())
+        final EventTextInfoDto textInfoDto = EventTextInfoDto.builder()
                 .title(event.getTitle())
                 .description(event.getDescription())
                 .annotation(event.getAnnotation())
+                .build();
+        final EventExternalDataDto externalDataDto = EventExternalDataDto.builder()
+                .confirmedRequests(event.getConfirmedRequests())
+                .views(event.getViews())
+                .build();
+
+        return EventFullDto.builder()
+                .id(event.getId())
+                .eventTextInfoDto(textInfoDto)
                 .isPaid(event.getIsPaid())
                 .eventDate(event.getEventDate())
                 .initiator(initiator)
@@ -46,8 +54,7 @@ public class EventMapper extends AbstractMapper {
                 .location(location)
                 .state(event.getState())
                 .publishedOn(event.getPublishedOn())
-                .views(event.getViews())
-                .confirmedRequests(event.getConfirmedRequests())
+                .eventExternalDataDto(externalDataDto)
                 .build();
     }
 
