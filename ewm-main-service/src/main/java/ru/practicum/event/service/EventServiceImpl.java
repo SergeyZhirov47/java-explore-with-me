@@ -75,9 +75,6 @@ public class EventServiceImpl implements EventService {
         if (nonNull(eventUpdateDto.getStateAction())) {
             final EventState newState = mapToEventState(eventUpdateDto.getStateAction());
             eventFromDB.setState(newState);
-
-            // ToDo
-            // Нужно что-то делать с заявка на это событие?
         }
 
         // Категорию меняю вручную.
@@ -117,9 +114,6 @@ public class EventServiceImpl implements EventService {
             if (newState.equals(EventState.PUBLISHED)) {
                 eventFromDB.setPublishedOn(LocalDateTime.now());
             }
-
-            // ToDo
-            // Нужно что-то делать с заявка на это событие?
         }
 
         // Категорию меняю вручную.

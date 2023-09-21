@@ -62,7 +62,6 @@ public class EventPrivateController {
         return requestService.getRequestsInUserEvent(userId, eventId);
     }
 
-    // ToDo error
     @PatchMapping("/{eventId}/requests")
     public EventRequestStatusUpdateResultDto changeRequestStatus(@PathVariable long userId,
                                                                  @PathVariable long eventId,
