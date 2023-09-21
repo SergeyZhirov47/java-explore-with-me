@@ -41,7 +41,7 @@ public class EventAdminController {
 
     @PatchMapping("/{eventId}")
     public EventFullDto edit(@PathVariable long eventId, @RequestBody EventUpdateByAdminDto eventUpdateDto) {
-        log.info(String.format("PATCH /admin/events/{eventId}, {eventId} = %s, body = %s", eventId, eventUpdateDto));
+        log.info("PATCH /admin/events/{eventId}, {eventId} = {}, body = {}", eventId, eventUpdateDto);
         return eventService.edit(eventId, eventUpdateDto);
     }
 }

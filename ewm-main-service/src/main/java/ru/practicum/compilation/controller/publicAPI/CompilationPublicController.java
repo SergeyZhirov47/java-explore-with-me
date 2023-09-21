@@ -26,13 +26,13 @@ public class CompilationPublicController {
     public List<CompilationDto> getFiltered(@RequestParam(defaultValue = "false") Boolean pinned,
                                             @PositiveOrZero @RequestParam(defaultValue = DEFAULT_FROM_VALUE) Integer from,
                                             @Positive @RequestParam(defaultValue = DEFAULT_SIZE_VALUE) Integer size) {
-        log.info(String.format("GET /compilations?pinned={pinned}&from={from}&size={size}, {pinned} = %s, {from} = %s, {size} = %s", pinned, from, size));
+        log.info("GET /compilations, pinned = {}, from = {}, size = {}", pinned, from, size);
         return compilationService.getFilteredCompilations(pinned, from, size);
     }
 
     @GetMapping("/{compId}")
     public CompilationDto getCompilation(@PathVariable long compId) {
-        log.info(String.format("POST /compilations/{compId}, {compId} = %s", compId));
+        log.info("POST /compilations/{compId}, {compId} = {}", compId);
         return compilationService.getCompilation(compId);
     }
 }

@@ -51,7 +51,7 @@ public class EventPublicController {
 
     @GetMapping("/{id}")
     public EventFullDto getEventFullInfo(@PathVariable long id, HttpServletRequest request) throws JsonProcessingException {
-        log.info(String.format("GET /events/{id}, {id} = %s", id));
+        log.info("GET /events/{id}, {id} = {}", id);
 
         final EventFullDto eventFullDto = eventService.getEventOnlyIfPublished(id);
         clientWrapper.saveHit(request);
