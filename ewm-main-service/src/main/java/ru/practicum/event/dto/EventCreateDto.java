@@ -6,7 +6,6 @@ import lombok.Data;
 import lombok.experimental.SuperBuilder;
 import lombok.extern.jackson.Jacksonized;
 import org.hibernate.validator.constraints.Length;
-import ru.practicum.event.model.Location;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
@@ -34,7 +33,7 @@ public class EventCreateDto {
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = DATE_PARAM_FORMAT_PATTERN)
     private LocalDateTime eventDate;
     @NotNull
-    private Location location;
+    private LocationDto location;
     @JsonProperty("paid")
     private Boolean isPaid;
     private Integer participantLimit;
