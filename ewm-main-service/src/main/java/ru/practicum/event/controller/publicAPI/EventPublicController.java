@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.common.StatsClientWrapper;
 import ru.practicum.event.dto.EventFullDto;
@@ -12,6 +13,8 @@ import ru.practicum.event.model.EventSort;
 import ru.practicum.event.service.EventService;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.validation.constraints.Positive;
+import javax.validation.constraints.PositiveOrZero;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -24,6 +27,7 @@ import static ru.practicum.common.Utils.*;
 
 @RestController
 @RequiredArgsConstructor
+@Validated
 @RequestMapping(path = "/events")
 @Slf4j
 public class EventPublicController {
@@ -38,8 +42,8 @@ public class EventPublicController {
                                                   @RequestParam(required = false) @DateTimeFormat(pattern = DATE_PARAM_FORMAT_PATTERN) LocalDateTime rangeEnd,
                                                   @RequestParam(defaultValue = "false") Boolean onlyAvailable,
                                                   @RequestParam(required = false) EventSort sort,
-                                                  @RequestParam(defaultValue = DEFAULT_FROM_VALUE) Integer from,
-                                                  @RequestParam(defaultValue = DEFAULT_SIZE_VALUE) Integer size,
+                                                  @PositiveOrZero @RequestParam(defaultValue = DEFAULT_FROM_VALUE) Integer from,
+                                                  @Positive @RequestParam(defaultValue = DEFAULT_SIZE_VALUE) Integer size,
                                                   HttpServletRequest request) throws JsonProcessingException {
         Map<String, Object> params = new HashMap<>();
         params.put("text", text);

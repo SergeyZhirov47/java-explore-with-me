@@ -3,12 +3,15 @@ package ru.practicum.event.controller.adminAPI;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.event.dto.EventFullDto;
 import ru.practicum.event.dto.EventUpdateByAdminDto;
 import ru.practicum.event.model.EventState;
 import ru.practicum.event.service.EventService;
 
+import javax.validation.constraints.Positive;
+import javax.validation.constraints.PositiveOrZero;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -22,6 +25,7 @@ import static ru.practicum.common.Utils.*;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping(path = "/admin/events")
+@Validated
 @Slf4j
 public class EventAdminController {
     private final EventService eventService;
@@ -32,8 +36,8 @@ public class EventAdminController {
                                      @RequestParam(required = false) List<Long> categories,
                                      @RequestParam(required = false) @DateTimeFormat(pattern = DATE_PARAM_FORMAT_PATTERN) LocalDateTime rangeStart,
                                      @RequestParam(required = false) @DateTimeFormat(pattern = DATE_PARAM_FORMAT_PATTERN) LocalDateTime rangeEnd,
-                                     @RequestParam(defaultValue = DEFAULT_FROM_VALUE) Integer from,
-                                     @RequestParam(defaultValue = DEFAULT_SIZE_VALUE) Integer size) {
+                                     @PositiveOrZero @RequestParam(defaultValue = DEFAULT_FROM_VALUE) Integer from,
+                                     @Positive @RequestParam(defaultValue = DEFAULT_SIZE_VALUE) Integer size) {
         Map<String, Object> params = new HashMap<>();
         params.put("users", users);
         params.put("states", states);

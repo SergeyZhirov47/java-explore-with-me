@@ -3,6 +3,7 @@ package ru.practicum.event.controller.privateAPI;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.event.dto.EventCreateDto;
 import ru.practicum.event.dto.EventFullDto;
@@ -14,6 +15,8 @@ import ru.practicum.request.dto.RequestDto;
 import ru.practicum.request.service.RequestService;
 
 import javax.validation.Valid;
+import javax.validation.constraints.Positive;
+import javax.validation.constraints.PositiveOrZero;
 import java.util.List;
 
 import static ru.practicum.common.Utils.DEFAULT_FROM_VALUE;
@@ -21,6 +24,7 @@ import static ru.practicum.common.Utils.DEFAULT_SIZE_VALUE;
 
 @RestController
 @RequiredArgsConstructor
+@Validated
 @RequestMapping(path = "/users/{userId}/events")
 @Slf4j
 public class EventPrivateController {
@@ -29,8 +33,8 @@ public class EventPrivateController {
 
     @GetMapping
     public List<EventFullDto> getUserEvents(@PathVariable long userId,
-                                            @RequestParam(defaultValue = DEFAULT_FROM_VALUE) Integer from,
-                                            @RequestParam(defaultValue = DEFAULT_SIZE_VALUE) Integer size) {
+                                            @PositiveOrZero @RequestParam(defaultValue = DEFAULT_FROM_VALUE) Integer from,
+                                            @Positive @RequestParam(defaultValue = DEFAULT_SIZE_VALUE) Integer size) {
         log.info(String.format("GET /users/{userId}/events, {userId} = %s, from = %s, size = %s", userId, from, size));
         return eventService.getEventsByUser(userId, from, size);
     }
