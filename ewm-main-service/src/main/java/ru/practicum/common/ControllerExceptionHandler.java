@@ -35,4 +35,10 @@ public class ControllerExceptionHandler {
         log.warn(exp.getMessage(), exp);
         return new ErrorResponseData(exp.getMessage());
     }
+
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    public ErrorResponseData handleThrowable(Throwable exp) {
+        log.warn(exp.getMessage(), exp);
+        return new ErrorResponseData(exp.getMessage());
+    }
 }
