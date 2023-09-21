@@ -31,6 +31,7 @@ import static java.util.Objects.nonNull;
 import static java.util.stream.Collectors.*;
 
 @Service
+@Transactional
 @RequiredArgsConstructor
 @Slf4j
 public class EventServiceImpl implements EventService {
@@ -41,7 +42,6 @@ public class EventServiceImpl implements EventService {
     private final StatsClientWrapper statsClientWrapper;
 
     @Override
-    @Transactional
     public EventFullDto add(long userId, EventCreateDto eventCreateDto) {
         final User initiator = userDao.getUser(userId);
         final Category category = categoryDao.getCategory(eventCreateDto.getCategoryId());
@@ -61,7 +61,6 @@ public class EventServiceImpl implements EventService {
     }
 
     @Override
-    @Transactional
     public EventFullDto edit(long userId, long eventId, EventUpdateByUserDto eventUpdateDto) {
         validateNotNullFields(eventUpdateDto);
 
@@ -89,7 +88,6 @@ public class EventServiceImpl implements EventService {
     }
 
     @Override
-    @Transactional
     public EventFullDto edit(long eventId, EventUpdateByAdminDto eventUpdateDto) {
         validateNotNullFields(eventUpdateDto);
 
@@ -128,6 +126,7 @@ public class EventServiceImpl implements EventService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public EventFullDto getEventByUser(long userId, long eventId) {
         final Event event = eventDao.getEventByUser(eventId, userId);
         return EventMapper.toEventFullDto(event);

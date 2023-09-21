@@ -23,13 +23,13 @@ import static java.util.Objects.nonNull;
 import static java.util.stream.Collectors.toUnmodifiableList;
 
 @Service
+@Transactional
 @RequiredArgsConstructor
 public class CompilationServiceImpl implements CompilationService {
     private final CompilationDao compilationDao;
     private final EventDao eventDao;
 
     @Override
-    @Transactional
     public CompilationDto add(CompilationCreateDto compilationCreateDto) {
         Compilation compilation = CompilationMapper.toCompilation(compilationCreateDto);
 
@@ -44,7 +44,6 @@ public class CompilationServiceImpl implements CompilationService {
     }
 
     @Override
-    @Transactional
     public CompilationDto update(long id, CompilationUpdateDto compilationUpdateDto) {
         Compilation compilationFromDB = compilationDao.getCompilation(id);
 
@@ -65,13 +64,13 @@ public class CompilationServiceImpl implements CompilationService {
     }
 
     @Override
-    @Transactional
     public void delete(long id) {
         compilationDao.checkCompilationExists(id);
         compilationDao.delete(id);
     }
 
     @Override
+    @Transactional(readOnly = true)
     public CompilationDto getCompilation(long id) {
         final Compilation compilation = compilationDao.getCompilation(id);
         return CompilationMapper.toCompilationDto(compilation);

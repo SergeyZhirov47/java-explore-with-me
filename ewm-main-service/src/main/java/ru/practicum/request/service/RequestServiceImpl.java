@@ -25,6 +25,7 @@ import java.util.List;
 import static java.util.stream.Collectors.toUnmodifiableList;
 
 @Service
+@Transactional
 @RequiredArgsConstructor
 @Slf4j
 public class RequestServiceImpl implements RequestService {
@@ -33,7 +34,6 @@ public class RequestServiceImpl implements RequestService {
     private final EventDao eventDao;
 
     @Override
-    @Transactional
     public RequestDto add(long userId, long eventId) {
         final User requester = userDao.getUser(userId);
         final Event event = eventDao.getEvent(eventId);
@@ -68,7 +68,6 @@ public class RequestServiceImpl implements RequestService {
     }
 
     @Override
-    @Transactional
     public EventRequestStatusUpdateResultDto changeStatus(long userId, long eventId, EventRequestStatusUpdateDataDto updateDataDto) {
         userDao.checkUserExists(userId);
         final Event event = eventDao.getEvent(eventId);
@@ -113,7 +112,6 @@ public class RequestServiceImpl implements RequestService {
     }
 
     @Override
-    @Transactional
     public RequestDto cancel(long userId, long requestId) {
         userDao.checkUserExists(userId);
 

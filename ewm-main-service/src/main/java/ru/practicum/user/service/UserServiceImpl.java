@@ -17,11 +17,13 @@ import static java.util.Objects.isNull;
 import static java.util.stream.Collectors.toUnmodifiableList;
 
 @Service
+@Transactional
 @RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
     private final UserDao userDao;
 
     @Override
+    @Transactional(readOnly = true)
     public List<UserDto> getUsersInfo(List<Long> ids, Integer from, Integer size) {
         final Pageable pageRequest = OffsetPageableValidator.validateAndGet(from, size);
 
@@ -42,7 +44,6 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    @Transactional
     public void delete(long id) {
         userDao.checkUserExists(id);
         userDao.delete(id);

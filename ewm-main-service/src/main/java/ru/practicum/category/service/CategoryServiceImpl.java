@@ -15,11 +15,13 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
+@Transactional
 @RequiredArgsConstructor
 public class CategoryServiceImpl implements CategoryService {
     private final CategoryDao categoryDao;
 
     @Override
+    @Transactional(readOnly = true)
     public List<CategoryDto> getCategories(Integer from, Integer size) {
         final Pageable offsetPageable = OffsetPageableValidator.validateAndGet(from, size);
         final List<Category> categories = categoryDao.getCategories(offsetPageable);
@@ -28,6 +30,7 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public CategoryDto getCategory(long id) {
         categoryDao.checkCategoryExists(id);
 
@@ -36,7 +39,6 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     @Override
-    @Transactional
     public void delete(long id) {
         categoryDao.checkCategoryExists(id);
         categoryDao.delete(id);
@@ -51,7 +53,6 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     @Override
-    @Transactional
     public CategoryDto update(long id, CategoryChangesDto categoryChangesDto) {
         Category category = categoryDao.getCategory(id);
         category.setName(categoryChangesDto.getName());
