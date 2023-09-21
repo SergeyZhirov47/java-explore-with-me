@@ -16,13 +16,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.validation.constraints.Positive;
 import javax.validation.constraints.PositiveOrZero;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
 
-import static java.util.Objects.nonNull;
 import static ru.practicum.common.Utils.*;
 
 @RestController
@@ -45,28 +40,8 @@ public class EventPublicController {
                                                   @PositiveOrZero @RequestParam(defaultValue = DEFAULT_FROM_VALUE) Integer from,
                                                   @Positive @RequestParam(defaultValue = DEFAULT_SIZE_VALUE) Integer size,
                                                   HttpServletRequest request) throws JsonProcessingException {
-        Map<String, Object> params = new HashMap<>();
-        params.put("text", text);
-        params.put("categories", categories);
-        params.put("paid", paid);
-        params.put("rangeStart", rangeStart);
-        params.put("rangeEnd", rangeEnd);
-        params.put("onlyAvailable", onlyAvailable);
-        params.put("sort", sort);
-        params.put("from", from);
-        params.put("size", size);
-
-        params = params.entrySet().stream()
-                .filter(p -> nonNull(p.getValue()))
-                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
-
-        final List<String> paramValueList = new ArrayList<>();
-        for (Map.Entry<String, Object> kv : params.entrySet()) {
-            String paramValueStr = kv.getKey() + " = " + kv.getValue().toString();
-            paramValueList.add(paramValueStr);
-        }
-
-        log.info("GET /events c параметрами: " + String.join(", ", paramValueList));
+        log.info("GET /events c параметрами: text = {}, categories = {}, paid = {}, rangeStart = {}, rangeEnd = {}, onlyAvailable = {}, sort = {}, from = {}, size = {}",
+                text, categories, paid, rangeStart, rangeEnd, onlyAvailable, sort, from, size);
 
         final List<EventShortDto> publishedEvents = eventService.getPublishedEvents(text, categories, paid, rangeStart, rangeEnd, onlyAvailable, sort, from, size);
         clientWrapper.saveHit(request);

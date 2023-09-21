@@ -13,13 +13,8 @@ import ru.practicum.event.service.EventService;
 import javax.validation.constraints.Positive;
 import javax.validation.constraints.PositiveOrZero;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
 
-import static java.util.Objects.nonNull;
 import static ru.practicum.common.Utils.*;
 
 @RestController
@@ -38,26 +33,8 @@ public class EventAdminController {
                                      @RequestParam(required = false) @DateTimeFormat(pattern = DATE_PARAM_FORMAT_PATTERN) LocalDateTime rangeEnd,
                                      @PositiveOrZero @RequestParam(defaultValue = DEFAULT_FROM_VALUE) Integer from,
                                      @Positive @RequestParam(defaultValue = DEFAULT_SIZE_VALUE) Integer size) {
-        Map<String, Object> params = new HashMap<>();
-        params.put("users", users);
-        params.put("states", states);
-        params.put("categories", categories);
-        params.put("rangeStart", rangeStart);
-        params.put("rangeEnd", rangeEnd);
-        params.put("from", from);
-        params.put("size", size);
-
-        params = params.entrySet().stream()
-                .filter(p -> nonNull(p.getValue()))
-                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
-
-        final List<String> paramValueList = new ArrayList<>();
-        for (Map.Entry<String, Object> kv : params.entrySet()) {
-            String paramValueStr = kv.getKey() + " = " + kv.getValue().toString();
-            paramValueList.add(paramValueStr);
-        }
-
-        log.info("GET /admin/events c параметрами: " + String.join(", ", paramValueList));
+        log.info("GET /admin/events c параметрами: users = {}, states = {}, categories = {}, rangeStart = {}, rangeEnd = {}, from = {}, size = {}",
+                users, states, categories, rangeStart, rangeEnd, from, size);
 
         return eventService.search(users, states, categories, rangeStart, rangeEnd, from, size);
     }
