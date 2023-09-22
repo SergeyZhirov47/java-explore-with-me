@@ -25,9 +25,27 @@ services:
       - POSTGRES_USER=root
       - POSTGRES_PASSWORD=secret_password
 
-#  ewm-service:
-#    ports:
-#      - "8080:8080"
-#
-#  ewm-db:
-#    image: postgres:14-alpine
+  ewm-service:
+    build: ./ewm-main-service
+    container_name: main-service-container
+    ports:
+      - "8080:8080"
+    depends_on:
+      - ewm-db
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://ewm-db:5432/exploreWithMe-main-db
+      - DB_USERNAME=root
+      - DB_PASSWORD=main_secret_password
+      - SERVER_PORT=8080
+
+  ewm-db:
+    image: postgres:14-alpine
+    container_name: ewm-db-container
+    ports:
+      - "6551:5432"
+    volumes:
+      - /var/lib/postgresql/data
+    environment:
+      - POSTGRES_DB=exploreWithMe-main-db
+      - POSTGRES_USER=root
+      - POSTGRES_PASSWORD=main_secret_password
