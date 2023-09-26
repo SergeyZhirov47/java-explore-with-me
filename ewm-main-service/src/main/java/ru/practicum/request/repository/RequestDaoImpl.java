@@ -13,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Repository;
 import ru.practicum.common.exception.NotFoundException;
+import ru.practicum.event.model.EventState;
 import ru.practicum.request.model.QRequest;
 import ru.practicum.request.model.Request;
 import ru.practicum.request.model.RequestStatus;
@@ -23,6 +24,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+
+import static java.util.Objects.nonNull;
 
 @Repository
 @RequiredArgsConstructor
@@ -124,5 +127,20 @@ public class RequestDaoImpl implements RequestDao {
         }
 
         return resultMap;
+    }
+
+    @Override
+    public boolean isUserConfirmedEventParticipant(long userId, long eventId) {
+        final QRequest qRequest = QRequest.request;
+
+        final BooleanBuilder booleanBuilder = new BooleanBuilder();
+        booleanBuilder.and(qRequest.event().id.eq(eventId));
+        booleanBuilder.and(qRequest.event().state.eq(EventState.PUBLISHED));
+        booleanBuilder.and(qRequest.requester().id.eq(userId));
+        booleanBuilder.and(qRequest.status.eq(RequestStatus.CONFIRMED));
+
+        final Long idConfirmedRequest = queryFactory.select(qRequest.id.count()).from(qRequest).where(booleanBuilder).fetchOne();
+
+        return nonNull(idConfirmedRequest);
     }
 }
