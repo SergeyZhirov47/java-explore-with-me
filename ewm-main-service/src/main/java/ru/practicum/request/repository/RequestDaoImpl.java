@@ -139,8 +139,11 @@ public class RequestDaoImpl implements RequestDao {
         booleanBuilder.and(qRequest.requester().id.eq(userId));
         booleanBuilder.and(qRequest.status.eq(RequestStatus.CONFIRMED));
 
-        final Long idConfirmedRequest = queryFactory.select(qRequest.id.count()).from(qRequest).where(booleanBuilder).fetchOne();
+        final Long countConfirmedRequests = queryFactory.select(qRequest.id.count())
+                .from(qRequest)
+                .where(booleanBuilder)
+                .fetchOne();
 
-        return nonNull(idConfirmedRequest);
+        return nonNull(countConfirmedRequests) && countConfirmedRequests == 1;
     }
 }
