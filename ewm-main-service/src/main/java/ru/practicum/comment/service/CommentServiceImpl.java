@@ -82,7 +82,7 @@ public class CommentServiceImpl implements CommentService {
         final Comment comment = commentDao.getComment(commentId);
 
         if (comment.getAuthor().getId() != authorId) {
-            throw new IllegalArgumentException("Комментарий может удалить только его автор!");
+            throw new IllegalStateException("Комментарий может удалить только его автор!");
         }
 
         commentDao.deleteById(commentId);
