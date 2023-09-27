@@ -20,7 +20,7 @@ public class CommentDto {
     private String text;
     private long eventId;
     private long authorId;
-    private CommentStatus commentStatus;
+    private CommentStatus status;
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = DATE_PARAM_FORMAT_PATTERN)
     private LocalDateTime created;
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = DATE_PARAM_FORMAT_PATTERN)
