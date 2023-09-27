@@ -21,10 +21,7 @@ import ru.practicum.user.model.User;
 import ru.practicum.user.repository.UserDao;
 
 import java.time.LocalDateTime;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
@@ -358,7 +355,16 @@ public class EventServiceImpl implements EventService {
         final Map<String, Long> uriIdMap = ids.stream().collect(toMap(this::getEventUri, id -> id));
         final List<EndpointStatsDto> viewStats = getEventViewsStat(ids);
 
-        return viewStats.stream().collect(toMap(uriIdMap::get, EndpointStatsDto::getHits));
+        final Map<Long, Long> result = new HashMap<>();
+        for (EndpointStatsDto statsRecord : viewStats) {
+            final Long id = uriIdMap.get(statsRecord.getUri());
+
+            if (nonNull(id)) {
+                result.put(id, statsRecord.getHits());
+            }
+        }
+
+        return result;
     }
 
     private String getEventUri(long id) {
