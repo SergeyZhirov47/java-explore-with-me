@@ -2,6 +2,7 @@ package ru.practicum.comment.controller.privateAPI;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.comment.dto.CommentDto;
@@ -24,6 +25,7 @@ public class CommentsPrivateController {
     private final CommentService commentService;
 
     // Добавить комментарий к событию
+    @ResponseStatus(HttpStatus.CREATED)
     @PostMapping("/users/{userId}/events/{eventId}/comments")
     public CommentDto addComment(@PathVariable long userId,
                                  @PathVariable long eventId,
@@ -42,6 +44,7 @@ public class CommentsPrivateController {
     }
 
     // Удалить комментарий
+    @ResponseStatus(HttpStatus.NO_CONTENT)
     @DeleteMapping("/users/{userId}/comments/{commentId}")
     public void deleteComment(@PathVariable long userId, @PathVariable long commentId) {
         log.info("DELETE /users/{userId}/comments/{commentId}, {userid} = {}, {commentId} = {}", userId, commentId);
