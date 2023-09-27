@@ -64,11 +64,11 @@ public class CommentServiceImpl implements CommentService {
         Comment commentFromDB = commentDao.getComment(commentId);
 
         if (commentFromDB.getAuthor().getId() != authorId) {
-            throw new IllegalArgumentException("Комментарий может редактировать только его автор!");
+            throw new IllegalStateException("Комментарий может редактировать только его автор!");
         }
 
         if (!commentFromDB.getStatus().equals(CommentStatus.CREATED)) {
-            throw new IllegalArgumentException("Комментарий можно редактировать только до момента публикации!");
+            throw new IllegalStateException("Комментарий можно редактировать только до момента публикации!");
         }
 
         commentFromDB.setText(commentEditDto.getText());
