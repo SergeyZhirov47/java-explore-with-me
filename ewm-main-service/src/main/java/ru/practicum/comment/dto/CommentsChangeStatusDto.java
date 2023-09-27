@@ -6,6 +6,7 @@ import lombok.Data;
 import lombok.extern.jackson.Jacksonized;
 import ru.practicum.comment.model.CommentUpdateAdminAction;
 
+import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import java.util.Set;
 
@@ -15,6 +16,7 @@ import java.util.Set;
 @AllArgsConstructor
 public class CommentsChangeStatusDto {
     @NotNull
+    @NotEmpty
     private Set<Long> commentIds;
     @NotNull
     private CommentUpdateAdminAction action;
