@@ -34,7 +34,7 @@ public class CommentAdminController {
                                                         @RequestParam(required = false) @DateTimeFormat(pattern = DATE_PARAM_FORMAT_PATTERN) LocalDateTime createdDateEnd,
                                                         @PositiveOrZero @RequestParam(defaultValue = DEFAULT_FROM_VALUE) Integer from,
                                                         @Positive @RequestParam(defaultValue = DEFAULT_SIZE_VALUE) Integer size) {
-        log.info("GET admin/events/{eventId}/comments/unmoderated, {eventId} = {}, users = {}, from = {}, size = {}", eventId, users, from, size);
+        log.info("GET admin/events/{eventId}/comments/unmoderated, {eventId} = {}, text = {}, users = {}, from = {}, size = {}", eventId, text, users, from, size);
         return commentService.getEventUnmoderatedComments(eventId, text, users, createdDateStart, createdDateEnd, from, size);
     }
 
