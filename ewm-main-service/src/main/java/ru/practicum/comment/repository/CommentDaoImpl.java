@@ -1,22 +1,14 @@
 package ru.practicum.comment.repository;
 
 import com.querydsl.core.BooleanBuilder;
-import com.querydsl.core.types.dsl.PathBuilderFactory;
-import com.querydsl.jpa.JPQLTemplates;
-import com.querydsl.jpa.impl.JPAQuery;
-import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.jpa.repository.support.Querydsl;
 import org.springframework.stereotype.Repository;
 import ru.practicum.comment.model.Comment;
 import ru.practicum.comment.model.CommentStatus;
 import ru.practicum.comment.model.QComment;
 import ru.practicum.common.exception.NotFoundException;
 
-import javax.persistence.EntityManager;
-import javax.persistence.PersistenceContext;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
@@ -27,15 +19,7 @@ import static java.util.Objects.nonNull;
 @RequiredArgsConstructor
 public class CommentDaoImpl implements CommentDao {
     private final CommentRepository commentRepository;
-    private final JPAQueryFactory queryFactory;
-    @PersistenceContext
-    private EntityManager entityManager;
 
-    @Autowired
-    public CommentDaoImpl(EntityManager entityManager, CommentRepository commentRepository) {
-        this.commentRepository = commentRepository;
-        queryFactory = new JPAQueryFactory(JPQLTemplates.DEFAULT, entityManager);
-    }
 
     @Override
     public Comment save(Comment comment) {
@@ -87,8 +71,9 @@ public class CommentDaoImpl implements CommentDao {
                                                      Pageable pageable) {
         final QComment qComment = QComment.comment;
 
-        final BooleanBuilder booleanBuilder = new BooleanBuilder(qComment.event().id.eq(eventId)
-                .and(qComment.status.eq(CommentStatus.CREATED)));
+        final BooleanBuilder booleanBuilder = new BooleanBuilder(qComment.event().id.eq(eventId));
+        booleanBuilder.and(qComment.status.eq(CommentStatus.CREATED));
+
         if (nonNull(text) && !text.isBlank()) {
             booleanBuilder.and(qComment.text.containsIgnoreCase(text));
         }
@@ -102,9 +87,6 @@ public class CommentDaoImpl implements CommentDao {
             booleanBuilder.and(qComment.created.before(createdDateEnd));
         }
 
-        final JPAQuery<Comment> searchQuery = queryFactory.selectFrom(qComment).where(booleanBuilder);
-        final Querydsl querydsl = new Querydsl(entityManager, (new PathBuilderFactory()).create(QComment.class));
-
-        return querydsl.applyPagination(pageable, searchQuery).fetch();
+        return commentRepository.findAll(booleanBuilder, pageable).getContent();
     }
 }
