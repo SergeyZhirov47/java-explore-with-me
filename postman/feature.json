@@ -1263,7 +1263,9 @@
               "\r",
               "        pm.collectionVariables.set('userId', commentAuthor.id);\r",
               "        pm.collectionVariables.set('commentId', comment.id);\r",
-              "        pm.collectionVariables.set(\"response\", findedComment);\r",
+              "        pm.collectionVariables.set(\"preRequestObject\", findedComment);\r",
+              "\r",
+              "        console.log('inside pre-request (collectionVariables)', pm.collectionVariables.get('preRequestObject'));\r",
               "    } catch(err) {\r",
               "        console.error(\"Ошибка при подготовке тестовых данных.\", err);\r",
               "    }\r",
@@ -1295,13 +1297,13 @@
               "    pm.response.to.have.status(204);\r",
               "});\r",
               "\r",
-              "const source = pm.collectionVariables.get('response');\r",
+              "const source = pm.collectionVariables.get('preRequestObject');\r",
               "const commentId = pm.collectionVariables.get('commentId');\r",
               "const userId = pm.collectionVariables.get('userId');\r",
               "\r",
               "console.log('inside tests commentId = ', commentId);\r",
               "pm.test(\"Комментарий должен быть найден до удаления\", function () {\r",
-              "    console.log('inside tests source(response) = ', source);\r",
+              "    console.log('inside tests source(preRequestObject) = ', source);\r",
               "    pm.expect(source.id).equal(commentId, 'Идентификатор комментария должен совпадать с удаляемым');\r",
               "});\r",
               "\r",
@@ -1621,6 +1623,8 @@
               "        pm.collectionVariables.set('eventId', event.id);\r",
               "        pm.collectionVariables.set('commentId', comment.id);\r",
               "        pm.collectionVariables.set('response', comment);\r",
+              "\r",
+              "        console.log('inside pre-request (collectionVariables)',  pm.collectionVariables.get('response'));\r",
               "\r",
               "        pm.request.body.update({\r",
               "            mode: 'raw',\r",
@@ -3030,6 +3034,11 @@
     },
     {
       "key": "uid",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "preRequestObject",
       "value": "",
       "type": "string"
     }
