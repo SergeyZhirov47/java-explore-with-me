@@ -1,6 +1,7 @@
 package ru.practicum.comment.model;
 
 import lombok.*;
+import org.hibernate.annotations.CreationTimestamp;
 import ru.practicum.event.model.Event;
 import ru.practicum.user.model.User;
 
@@ -27,6 +28,7 @@ public class Comment {
     private String text;
     @Enumerated(EnumType.STRING)
     private CommentStatus status;
+    @CreationTimestamp
     private LocalDateTime created;
     private LocalDateTime published;
 }
