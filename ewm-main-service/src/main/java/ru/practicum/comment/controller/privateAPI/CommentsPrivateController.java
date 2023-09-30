@@ -18,6 +18,7 @@ import static ru.practicum.common.Utils.DEFAULT_FROM_VALUE;
 import static ru.practicum.common.Utils.DEFAULT_SIZE_VALUE;
 
 @RestController
+@RequestMapping("/users/{userId}")
 @RequiredArgsConstructor
 @Validated
 @Slf4j
@@ -26,7 +27,7 @@ public class CommentsPrivateController {
 
     // Добавить комментарий к событию
     @ResponseStatus(HttpStatus.CREATED)
-    @PostMapping("/users/{userId}/events/{eventId}/comments")
+    @PostMapping("/events/{eventId}/comments")
     public CommentDto addComment(@PathVariable long userId,
                                  @PathVariable long eventId,
                                  @Valid @RequestBody CommentEditDto commentEditDto) {
@@ -35,7 +36,7 @@ public class CommentsPrivateController {
     }
 
     // Изменить комментарий
-    @PatchMapping("/users/{userId}/comments/{commentId}")
+    @PatchMapping("/comments/{commentId}")
     public CommentDto editComment(@PathVariable long userId,
                                   @PathVariable long commentId,
                                   @Valid @RequestBody CommentEditDto commentEditDto) {
@@ -45,34 +46,25 @@ public class CommentsPrivateController {
 
     // Удалить комментарий
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    @DeleteMapping("/users/{userId}/comments/{commentId}")
+    @DeleteMapping("/comments/{commentId}")
     public void deleteComment(@PathVariable long userId, @PathVariable long commentId) {
         log.info("DELETE /users/{userId}/comments/{commentId}, {userid} = {}, {commentId} = {}", userId, commentId);
         commentService.delete(commentId, userId);
     }
 
     // Получение определенного комментария
-    @GetMapping("/users/{userId}/comments/{commentId}")
+    @GetMapping("/comments/{commentId}")
     public CommentDto getUserComment(@PathVariable long userId, @PathVariable long commentId) {
         log.info("GET /users/{userId}/comments/{commentId}, {userId} = {}, {commentId} = {}", userId, commentId);
         return commentService.getUserComment(userId, commentId);
     }
 
     // Получить все комментарии пользователя
-    @GetMapping("/users/{userId}/comments")
+    @GetMapping("/comments")
     public List<CommentDto> getUserComments(@PathVariable long userId,
                                             @PositiveOrZero @RequestParam(defaultValue = DEFAULT_FROM_VALUE) Integer from,
                                             @Positive @RequestParam(defaultValue = DEFAULT_SIZE_VALUE) Integer size) {
         log.info("GET /users/{userId}/comments, {userId} = {}, from = {}, size = {}", userId, from, size);
         return commentService.getUserComments(userId, from, size);
-    }
-
-    // Получить все опубликованные комментарии к событию
-    @GetMapping("/events/{eventId}/comments")
-    public List<CommentDto> getEventPublishedComments(@PathVariable long eventId,
-                                                      @PositiveOrZero @RequestParam(defaultValue = DEFAULT_FROM_VALUE) Integer from,
-                                                      @Positive @RequestParam(defaultValue = DEFAULT_SIZE_VALUE) Integer size) {
-        log.info("GET /events/{eventId}/comments, {eventId} = {}, from = {}, size = {}", eventId, from, size);
-        return commentService.getEventPublishedComments(eventId, from, size);
     }
 }
