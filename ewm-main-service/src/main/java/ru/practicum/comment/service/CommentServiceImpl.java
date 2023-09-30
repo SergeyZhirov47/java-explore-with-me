@@ -23,7 +23,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Service
-@Transactional
+@Transactional(readOnly = true)
 @RequiredArgsConstructor
 public class CommentServiceImpl implements CommentService {
     private final CommentDao commentDao;
@@ -34,6 +34,7 @@ public class CommentServiceImpl implements CommentService {
     private final Sort commentCreatedSortDesc = Sort.by("created").descending();
 
     @Override
+    @Transactional
     public CommentDto add(long authorId, long eventId, CommentEditDto commentEditDto) {
         final User author = userDao.getUser(authorId);
         final Event event = eventDao.getEvent(eventId);
@@ -52,7 +53,6 @@ public class CommentServiceImpl implements CommentService {
         comment.setAuthor(author);
         comment.setEvent(event);
         comment.setStatus(CommentStatus.CREATED);
-        comment.setCreated(LocalDateTime.now());
 
         comment = commentDao.save(comment);
 
@@ -60,6 +60,7 @@ public class CommentServiceImpl implements CommentService {
     }
 
     @Override
+    @Transactional
     public CommentDto edit(long authorId, long commentId, CommentEditDto commentEditDto) {
         Comment commentFromDB = commentDao.getComment(commentId);
 
@@ -78,6 +79,7 @@ public class CommentServiceImpl implements CommentService {
     }
 
     @Override
+    @Transactional
     public void delete(long commentId, long authorId) {
         final Comment comment = commentDao.getComment(commentId);
 
@@ -89,7 +91,6 @@ public class CommentServiceImpl implements CommentService {
     }
 
     @Override
-    @Transactional(readOnly = true)
     public CommentDto getUserComment(long authorId, long commentId) {
         final Comment comment = commentDao.getComment(commentId);
 
@@ -101,7 +102,6 @@ public class CommentServiceImpl implements CommentService {
     }
 
     @Override
-    @Transactional(readOnly = true)
     public List<CommentDto> getUserComments(long authorId, Integer from, Integer size) {
         final Pageable pageable = OffsetPageableValidator.validateAndGet(from, size, commentCreatedSortDesc);
         final List<Comment> userComments = commentDao.getUserComments(authorId, pageable);
@@ -110,7 +110,6 @@ public class CommentServiceImpl implements CommentService {
     }
 
     @Override
-    @Transactional(readOnly = true)
     public List<CommentDto> getEventPublishedComments(long eventId, Integer from, Integer size) {
         final Pageable pageable = OffsetPageableValidator.validateAndGet(from, size, commentCreatedSortDesc);
         final List<Comment> publishedComments = commentDao.getEventCommentsByStatus(eventId, List.of(CommentStatus.PUBLISHED), pageable);
@@ -119,7 +118,6 @@ public class CommentServiceImpl implements CommentService {
     }
 
     @Override
-    @Transactional(readOnly = true)
     public List<CommentDto> getEventUnmoderatedComments(long eventId,
                                                         String text,
                                                         List<Long> users,
@@ -134,6 +132,7 @@ public class CommentServiceImpl implements CommentService {
     }
 
     @Override
+    @Transactional
     public CommentsChangeStatusResponseDto changeCommentsStatus(CommentsChangeStatusDto commentsChangeStatusDto) {
         final List<Comment> comments = commentDao.getComments(commentsChangeStatusDto.getCommentIds());
         final CommentStatus newCommentStatus = mapToCommentStatus(commentsChangeStatusDto.getAction());
