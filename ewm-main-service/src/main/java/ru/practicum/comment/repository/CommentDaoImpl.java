@@ -20,7 +20,6 @@ import static java.util.Objects.nonNull;
 public class CommentDaoImpl implements CommentDao {
     private final CommentRepository commentRepository;
 
-
     @Override
     public Comment save(Comment comment) {
         return commentRepository.save(comment);
