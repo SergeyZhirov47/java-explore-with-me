@@ -32,4 +32,6 @@ public interface RequestDao {
 
     // Ключ - id события, значение - кол-во подтвержденных заявок на это событие.
     Map<Long, Long> getConfirmedRequestsCountMap(List<Long> eventIds);
+
+    boolean isUserConfirmedEventParticipant(long userId, long eventId);
 }
